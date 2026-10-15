@@ -4,6 +4,21 @@ namespace Echo.Bridge.Windows.Updates;
 
 internal static class BridgeUpdateSmoke
 {
+    public static void Complete(string file, string directory)
+    {
+        directory = BridgeSmoke.Evidence(directory);
+        try
+        {
+            BridgeUpdateHandoff.Complete(file, directory);
+            BridgeSmoke.Window(Path.Combine(directory, "restarted"));
+        }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException or JsonException or FormatException)
+        {
+            Environment.ExitCode = 1;
+            File.WriteAllBytes(Path.Combine(directory, "complete-error.json"), JsonSerializer.SerializeToUtf8Bytes(new { code = error.GetType().Name }));
+        }
+    }
+
     public static async Task Download(string directory)
     {
         directory = BridgeSmoke.Evidence(directory);

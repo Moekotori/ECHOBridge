@@ -110,9 +110,13 @@ internal static class BridgeUpdateHandoff
             using var helper = Process.GetCurrentProcess();
             job.Backup = transaction.Backup; job.HelperPid = helper.Id; job.HelperStarted = helper.StartTime.ToUniversalTime().Ticks;
             Write(file, job);
-            var restart = new ProcessStartInfo(Path.Combine(job.Target, "ECHO Bridge.exe")) { UseShellExecute = false, WorkingDirectory = job.Target };
+            var restart = new ProcessStartInfo(Path.Combine(job.Target, "ECHO Bridge.exe"))
+                { UseShellExecute = false, WorkingDirectory = diagnosticCache is null ? job.Target : Environment.CurrentDirectory };
             if (diagnosticCache is null) { restart.ArgumentList.Add("--updated"); restart.ArgumentList.Add(file); }
-            else { restart.ArgumentList.Add("--ui-smoke"); restart.ArgumentList.Add(Path.Combine(diagnosticCache, "restarted")); }
+            else
+            {
+                restart.ArgumentList.Add("--updated-smoke"); restart.ArgumentList.Add(file); restart.ArgumentList.Add(diagnosticCache);
+            }
             using var process = Process.Start(restart) ?? throw new IOException("Updated Bridge did not start.");
             transaction.Commit();
             if (diagnosticCache is not null)
@@ -133,9 +137,9 @@ internal static class BridgeUpdateHandoff
         }
     }
 
-    public static bool Complete(string file)
+    public static bool Complete(string file, string? diagnosticCache = null)
     {
-        var job = Read(file);
+        var job = Read(file, diagnosticCache);
         if (Version.Parse(job.Version) != Current || !Path.GetFullPath(job.Target).Equals(AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase))
             throw new InvalidDataException("Bridge restart does not match its update.");
         using (var helper = Find(job.HelperPid, job.HelperStarted))

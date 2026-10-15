@@ -10,6 +10,8 @@ internal static class Program
         { Updates.BridgeUpdateHandoff.Apply(smokeJob, BridgeSmoke.Evidence(smokeCache)); return; }
         if (args is ["--update-download-smoke", var downloadEvidence])
         { Updates.BridgeUpdateSmoke.Download(downloadEvidence).GetAwaiter().GetResult(); return; }
+        if (args is ["--updated-smoke", var completeJob, var completeEvidence])
+        { Updates.BridgeUpdateSmoke.Complete(completeJob, completeEvidence); return; }
         if (args is ["--sharing-smoke", var sharingLibrary, var sharingEvidence])
         { BridgeSharingSmoke.Run(sharingLibrary, sharingEvidence); return; }
         if (args is ["--sharing-smoke", var automaticLibrary, var automaticEvidence, var automaticAppData])

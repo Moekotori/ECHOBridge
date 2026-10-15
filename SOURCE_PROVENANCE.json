@@ -1268,7 +1268,7 @@
       "importedFiles": [
         {
           "path": "core/Echo.Bridge.Windows/Program.cs",
-          "sha256": "e66172df1d494ed208f07b10f0eb4cb64f54e8bc55d33d56015d0438493ae436"
+          "sha256": "9601883533d9589e70ac85cf0cff693fe79090563643476d96d8b85c4ab64329"
         },
         {
           "path": "core/Echo.Bridge.Windows/BridgeForm.cs",
@@ -1304,7 +1304,7 @@
         },
         {
           "path": "core/Echo.Bridge.Windows/Updates/BridgeUpdateHandoff.cs",
-          "sha256": "84f9140211327b2a18c1812af4b01dc91f1eda702b8b9a59f42372d34d00613a"
+          "sha256": "9c5269d9bf1b3832d2d06b185bdf2ce7dc9c17d889e6fb7dcfdaedaa7438494b"
         },
         {
           "path": "core/Echo.Bridge.Windows/Updates/BridgeUpdateInstaller.cs",
@@ -1320,7 +1320,7 @@
         },
         {
           "path": "core/Echo.Bridge.Windows/Updates/BridgeUpdateSmoke.cs",
-          "sha256": "5a73df17405b83ce771b1e3ad5d928581e232851c41deb6115ac0f382c398fd7"
+          "sha256": "4a1eb1938b3a2bbc3dea989ff708c5f7ae0e301ee140eacfbb6108bfbd482477"
         }
       ],
       "changes": [
