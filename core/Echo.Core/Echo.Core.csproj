@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Echo.Core</RootNamespace>
+    <AssemblyName>Echo.Core</AssemblyName>
+    <Description>ECHO library service, shared schema bootstrap and bounded query/write core. No UI or audio.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Search/Data/opencc-search.json.gz" />
+    <None Update="Search/Data/OPENCC-*" CopyToOutputDirectory="PreserveNewest" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.11" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.12" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Database/library-migrations.json" LogicalName="Echo.Core.Database.LibraryMigrations.json" />
+  </ItemGroup>
+</Project>

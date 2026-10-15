@@ -1,0 +1,16 @@
+/misc/
+**/bin/
+**/obj/
+/node_modules/
+.env
+.env.*
+*.pfx
+*.p12
+*.key
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.user
+*.suo
+*.log

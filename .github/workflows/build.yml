@@ -1,0 +1,21 @@
+name: Build and test Bridge
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Focused Bridge regression
+        run: dotnet test core/Echo.Bridge.Tests/Echo.Bridge.Tests.csproj -c Release -p:NuGetAudit=false --nologo -v:minimal
+      - name: Compile Windows shell
+        run: dotnet build core/Echo.Bridge.Windows/Echo.Bridge.Windows.csproj -c Release -p:NuGetAudit=false --nologo -v:minimal

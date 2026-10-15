@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <OutputType>WinExe</OutputType>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>ECHO Bridge</AssemblyName>
+    <RootNamespace>Echo.Bridge.Windows</RootNamespace>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Echo.Bridge\Echo.Bridge.csproj" />
+  </ItemGroup>
+</Project>

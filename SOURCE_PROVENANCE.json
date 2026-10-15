@@ -1,0 +1,1221 @@
+{
+  "project": "ECHO Bridge",
+  "version": "26.10.15",
+  "upstream": "https://github.com/Moekotori/ECHOSteam",
+  "upstreamCommit": "c6ca10c6f7851094de871389a6a021067f113c22",
+  "schemaDigest": "22cebc902f9c8dc6f1c5d2119ac6af58bcf60a89f26c082036d2b1e73e8f6618",
+  "copiedFiles": [
+    {
+      "path": "core/Echo.Bridge.Tests/BridgeFixture.cs",
+      "sha256": "c69af7597482012e3b81aa670aa01e44cd406dd20bc2a4f0712b07b9cd12e2d8"
+    },
+    {
+      "path": "core/Echo.Bridge.Tests/BridgeHttpTests.cs",
+      "sha256": "9cff012b5d5642e7f47c14979c8120b9842568103f1e4aa93b4ebdfe44a49731"
+    },
+    {
+      "path": "core/Echo.Bridge.Tests/BridgeLibraryTests.cs",
+      "sha256": "ccdb1e63ce518764c22348086643e0a0d26d47b7b33cc8f819ef3f70716a249c"
+    },
+    {
+      "path": "core/Echo.Bridge.Tests/BridgeProfileDiscoveryTests.cs",
+      "sha256": "367329218b33aec094dcb6e1b670fd7a2d44c0768baae2ff0f262551b75f2410"
+    },
+    {
+      "path": "core/Echo.Bridge.Tests/BridgeSharingSettingsTests.cs",
+      "sha256": "92c07e50ee6f69aa4e65dff149bb66a9bf4c11d0521e6dcf8cacbee7863a7e48"
+    },
+    {
+      "path": "core/Echo.Bridge.Tests/Echo.Bridge.Tests.csproj",
+      "sha256": "436e33845975bd9caee7db3eb0eb1ebc87dd053a863ff02f6ddd91f54ffaf6b3"
+    },
+    {
+      "path": "core/Echo.Bridge.Windows/BridgeForm.cs",
+      "sha256": "83c3f09ceb38c93fcf6f8514441ecf2d0c20bffc41400ba62e62359a3febfb6b"
+    },
+    {
+      "path": "core/Echo.Bridge.Windows/BridgeLibrarySelectionSmoke.cs",
+      "sha256": "7580630f50b6e698bff69f9cf167ef9826003ca94b389586cb600949883daf25"
+    },
+    {
+      "path": "core/Echo.Bridge.Windows/BridgeRuntime.cs",
+      "sha256": "7adca14865069aa0cf0bc376b45f372a8c497dbada29da02cdb758ae163fd419"
+    },
+    {
+      "path": "core/Echo.Bridge.Windows/BridgeSettings.cs",
+      "sha256": "6da9daf22979ecd8349f9581bf1401f519395b06f48585da327bd44086230556"
+    },
+    {
+      "path": "core/Echo.Bridge.Windows/BridgeSharingSmoke.cs",
+      "sha256": "6dc58bd12db181f4ceb39f89740785dee24a0d8c8ade89d93277eab94ecc96cc"
+    },
+    {
+      "path": "core/Echo.Bridge.Windows/BridgeSingleInstance.cs",
+      "sha256": "eb0ddc489c11084b70ed71aebedd0315d565b33e6f84b565a8452f19d5d7b662"
+    },
+    {
+      "path": "core/Echo.Bridge.Windows/BridgeSmoke.cs",
+      "sha256": "001ccb71f79fce35add20e4ebbeefbb90a37bf63d247b3887a71f2970cdd9051"
+    },
+    {
+      "path": "core/Echo.Bridge.Windows/BridgeStartupRegistration.cs",
+      "sha256": "a068741aa631fa180c1f83fac82ea3aa9adf15c0d7a6ef20bb5a5ec6da260c45"
+    },
+    {
+      "path": "core/Echo.Bridge.Windows/BridgeStartupSmoke.cs",
+      "sha256": "a34e0526c0f973a1f1e38e71c6cf51668c10a0c433602d6c3ba4e73b8a8ff12e"
+    },
+    {
+      "path": "core/Echo.Bridge.Windows/BridgeTheme.cs",
+      "sha256": "63d1e482799da0bc7f3a525372140acd830f7d3ed972018b0c40fb4f284da90c"
+    },
+    {
+      "path": "core/Echo.Bridge.Windows/BridgeView.cs",
+      "sha256": "34fb9896f25422c995a75257e8c17ca1db66dc227782aa48725b8ad71247c33c"
+    },
+    {
+      "path": "core/Echo.Bridge.Windows/Echo.Bridge.Windows.csproj",
+      "sha256": "f8a8441503e05bc04648c5ed596cc42b6212a7e27e8f6a0251f222806438e186"
+    },
+    {
+      "path": "core/Echo.Bridge.Windows/Program.cs",
+      "sha256": "46c9150f4218906f7b5250d5bef5c07beeacbfa3538a653637529acbd1aabdc1"
+    },
+    {
+      "path": "core/Echo.Bridge/BridgeException.cs",
+      "sha256": "e5f114d4933af59340f57be082fe9d2f634599b33d659d13776e0e243d657556"
+    },
+    {
+      "path": "core/Echo.Bridge/BridgeSession.cs",
+      "sha256": "3b46b75269c67c3757ac4abae6163c2862f74687cc2f271fade44fca795fb72c"
+    },
+    {
+      "path": "core/Echo.Bridge/Echo.Bridge.csproj",
+      "sha256": "fe2df4e63c721307cc471efd9b13993819f9ecb30a76fcde690ac34d7ba287a2"
+    },
+    {
+      "path": "core/Echo.Bridge/Library/BridgeArtwork.cs",
+      "sha256": "511abed82ce0842a9267ec8ad9e69b014c69eed00bd135ecaf9afa76c2b4dba0"
+    },
+    {
+      "path": "core/Echo.Bridge/Library/BridgeCatalog.cs",
+      "sha256": "0d9392dd312be8decab8172351a17f56491d9542199b34563a6e471c57acdfdd"
+    },
+    {
+      "path": "core/Echo.Bridge/Library/BridgeFolderReferences.cs",
+      "sha256": "c43bee405392760638ac52e21552d2836c85fb976115103fadb4fcedcca9e885"
+    },
+    {
+      "path": "core/Echo.Bridge/Library/BridgeLibraryMetadata.cs",
+      "sha256": "0c32a7257e511ad192ab62cdc71d3724efd511663902d4809ffaf7f916671a58"
+    },
+    {
+      "path": "core/Echo.Bridge/Library/BridgeLibraryReader.cs",
+      "sha256": "00efc372847b0852452fdafaf5878b8f093f2920cf6eb7d8f9ce4552a32f0753"
+    },
+    {
+      "path": "core/Echo.Bridge/Library/BridgeLyrics.cs",
+      "sha256": "02eaf82cc5ccefac8379c3d4b4db6a5acf3468fd9a19462e61ed4c85aa62bcac"
+    },
+    {
+      "path": "core/Echo.Bridge/Library/BridgeProfile.cs",
+      "sha256": "d2dd931374884265afaeeb93780986487a0360245abcbdc8f838693f2097390a"
+    },
+    {
+      "path": "core/Echo.Bridge/Library/BridgeProfileDiscovery.cs",
+      "sha256": "4c89bed5f37f16938e4106f0ccab9adcea5901a7902605213fb22c1c15b08315"
+    },
+    {
+      "path": "core/Echo.Bridge/Library/BridgeTrackProjection.cs",
+      "sha256": "977240a78c46db07392026d28db9e83674d320109a879eb6a9d0cdeaedb4cc0c"
+    },
+    {
+      "path": "core/Echo.Bridge/Link/BridgeHttpServer.cs",
+      "sha256": "05743771758b4ae05e91b8eb65e038f6e72be7e5536e84eb127c96cd24865c3f"
+    },
+    {
+      "path": "core/Echo.Bridge/Link/BridgeLan.cs",
+      "sha256": "744bd7dd1e635486eb8c8eaf5c62b41c101d8aff74acaac72eb3514b8138ba88"
+    },
+    {
+      "path": "core/Echo.Bridge/Link/BridgeMdnsAdvertiser.cs",
+      "sha256": "a3abe5397ef1e05387bbdafbe73f3110a705b42c632e9bd866a6c95cf6653f3d"
+    },
+    {
+      "path": "core/Echo.Bridge/Link/BridgeMdnsPacket.cs",
+      "sha256": "5988b5d2cb29d22ee960d3cf4257e7fd1bec3cbddacab2b16b61aa3605d88ea8"
+    },
+    {
+      "path": "core/Echo.Bridge/Link/BridgeMediaResponse.cs",
+      "sha256": "4ff62a1adeb6e539eebd919b72b5802a0b1559853663133fd7f787a862bd0425"
+    },
+    {
+      "path": "core/Echo.Bridge/Link/BridgeMediaTokens.cs",
+      "sha256": "4b105c931af50a756cf5e8b1572952192cb97ab37f82d19b90202059c816a288"
+    },
+    {
+      "path": "core/Echo.Core/Albums/AlbumCanonicalClasses.cs",
+      "sha256": "e5617e151054704459a77df7415dea9fe171531e5b50351be6b885696d2a7ceb"
+    },
+    {
+      "path": "core/Echo.Core/Albums/AlbumCoverGrouping.cs",
+      "sha256": "35e6490917b1031f26066dffef26b8c4d3d35cfc334a61a73df7c7c95b27a6cc"
+    },
+    {
+      "path": "core/Echo.Core/Albums/AlbumCreditParts.cs",
+      "sha256": "9b6548656cecec208ddb349084991f67ddd50a33d248779497b8981bb1e29132"
+    },
+    {
+      "path": "core/Echo.Core/Albums/AlbumCredits.cs",
+      "sha256": "8d86e8e4bdbf80736c4bb240538e582b31489f01cb32f14054ebbe51d98c89dd"
+    },
+    {
+      "path": "core/Echo.Core/Albums/AlbumDiscMetadata.cs",
+      "sha256": "f365085ac7b99bdb1a0e33ba92186073527ebbc923f063d11f99b2aaa2a5e890"
+    },
+    {
+      "path": "core/Echo.Core/Albums/AlbumGroupingIdentityAssignment.cs",
+      "sha256": "ff5634af7fadcf9ab7f79fc40a33e2aeef3205d6f4342a4774134f9007982321"
+    },
+    {
+      "path": "core/Echo.Core/Albums/AlbumGroupingReadMemo.cs",
+      "sha256": "6dc70d571c19961e0dec91c4361910e3824c93195968d4921a7e4876896f95bf"
+    },
+    {
+      "path": "core/Echo.Core/Albums/AlbumGroupingStage.cs",
+      "sha256": "ff9e096db3503c9c7b36a98e5ef313c0f09bcb95bf4d2dd93a87bf30772b073e"
+    },
+    {
+      "path": "core/Echo.Core/Albums/AlbumGroupingStats.cs",
+      "sha256": "759cb0e887d6cbd1da06d2433e2106764f9154e33701b1f7325181fe7b98aa48"
+    },
+    {
+      "path": "core/Echo.Core/Albums/AlbumGroupingWriter.cs",
+      "sha256": "72111b53fb91dd84a09a3a29991162844929900031b274b38533ae15a90f953a"
+    },
+    {
+      "path": "core/Echo.Core/Albums/AlbumIdentity.cs",
+      "sha256": "5b97de827956e3406e2051be362da2ac4dfbcce8b7f0c36f0ce9e515bf8522b8"
+    },
+    {
+      "path": "core/Echo.Core/Albums/AlbumIndexTrackOrder.cs",
+      "sha256": "f58fa360e68771134c36def60452c39ab17c66a61c566b29d6cc82d51ee3db60"
+    },
+    {
+      "path": "core/Echo.Core/Albums/AlbumLooseGrouping.cs",
+      "sha256": "5269961debda48b70da5f2623a8001022aaa7ba8d6ae1e40a3052ac66656dc2a"
+    },
+    {
+      "path": "core/Echo.Core/Albums/AlbumPlaylistMigration.cs",
+      "sha256": "bfbba3c689386f440241b650980a290cdea0bc76af01c99a6a259ce0e05a1ebc"
+    },
+    {
+      "path": "core/Echo.Core/Albums/AlbumUnicodeData.cs",
+      "sha256": "0a6616eff5c959720ef4691c2a0781fee6ecfbc77b4592491cb4f5112b38df70"
+    },
+    {
+      "path": "core/Echo.Core/Albums/AlbumUnicodeNormalization.cs",
+      "sha256": "4b2923118c8ecccb9a1e456c8a3a456bfa62ce315bd27da7f332bb2f761ca187"
+    },
+    {
+      "path": "core/Echo.Core/Albums/AlbumUserStateMigration.cs",
+      "sha256": "1f70e1a84a0d456f753a192566a0d09b32df92ece658d1bf1319a869197cd872"
+    },
+    {
+      "path": "core/Echo.Core/Albums/AlbumVersionIndexMigration.cs",
+      "sha256": "6da91b24de7fa9949e064cc8941b640552b22af60781cc5505e2031824d7fcac"
+    },
+    {
+      "path": "core/Echo.Core/Albums/GroupingArtistPolicy.cs",
+      "sha256": "2de8e0b6a20f6b7193d7811895e38d6c2af27d9040754d7b39f0a7f6f8eaff8e"
+    },
+    {
+      "path": "core/Echo.Core/Albums/GroupingArtistSimilarity.cs",
+      "sha256": "8f92d13f7c0d41a6608ceb4a282a82018018c6283c5496f5c80c69bf7e68e664"
+    },
+    {
+      "path": "core/Echo.Core/Albums/GroupingArtistWriter.cs",
+      "sha256": "f96b90c7abbfe1da18f6acc7f7c0a1234ed033d4ec7674f45bcf3b249470b1bb"
+    },
+    {
+      "path": "core/Echo.Core/Albums/GroupingRebuildWriter.cs",
+      "sha256": "2664e59012594191c4e266fb6f44512aae1fec64196c94d009bdaec3d7829540"
+    },
+    {
+      "path": "core/Echo.Core/Albums/RemoteGroupingIdentity.cs",
+      "sha256": "18742e7bb65baece4641598c2be725f13258c7740300147b4b8f71cd3f9e5164"
+    },
+    {
+      "path": "core/Echo.Core/Albums/RemoteGroupingReferences.cs",
+      "sha256": "4fac9a03a3ce7f8eea1ebf7e28d590fb8429767c8062dd22a541d6a4f8ca809d"
+    },
+    {
+      "path": "core/Echo.Core/Database/BoundedStatementCache.cs",
+      "sha256": "f614c43f347a2fbff6c62335e35ccdc1d3a3a8f9b97858d6c688da0299b52205"
+    },
+    {
+      "path": "core/Echo.Core/Database/CommandReceiptJournal.cs",
+      "sha256": "df9fa052b223dc227edd81b8ebb4ef242ddc621411472cf99bf6433231b2843e"
+    },
+    {
+      "path": "core/Echo.Core/Database/LibraryDatabaseBootstrap.cs",
+      "sha256": "458afd94110a9bb5047ecf6d6dd5a7a4345ca61c6402cbb22adfa5c6ed27c538"
+    },
+    {
+      "path": "core/Echo.Core/Database/LibraryMigrationCatalog.cs",
+      "sha256": "f8116eb885acaea289a03c94bbff524010fe30c3d0ad1b0f0a52b3d083f2b82e"
+    },
+    {
+      "path": "core/Echo.Core/Database/LibraryMigrationSteps.cs",
+      "sha256": "978145947aa81dd6636b777fe2c4309e01178bc31b6321078237172bfb616787"
+    },
+    {
+      "path": "core/Echo.Core/Database/MutationStreamJournal.cs",
+      "sha256": "8c2fdddf0a76c414c4acb5ea4b80d262897d325132c3164c8f60cb6ea94f999a"
+    },
+    {
+      "path": "core/Echo.Core/Database/ReadOnlyLibraryDatabase.cs",
+      "sha256": "2916030bcdc09dd2802dcfe57de733e2a4c915b4c8761f9962e9ed51dc148b70"
+    },
+    {
+      "path": "core/Echo.Core/Database/SchemaCapabilityProbe.cs",
+      "sha256": "41625042a4056fc45a75ac1cce5271e2ca00361658470ee274a29866ccf44913"
+    },
+    {
+      "path": "core/Echo.Core/Database/TransactionCommandCache.cs",
+      "sha256": "3800f3a5369b2330430121d80ad646ebb5053fce8e89ecf7d5506080c6d277c5"
+    },
+    {
+      "path": "core/Echo.Core/Database/TransactionSql.cs",
+      "sha256": "6875e3b63c4a1a1d2a01b22c6918cb863709cb8e6be6ba9dc88a03df5d335677"
+    },
+    {
+      "path": "core/Echo.Core/Duplicates/DuplicateCleanupCandidatesQuery.cs",
+      "sha256": "52df454f3eb752af74e18324c90db3435a4b49340753aab5beff7425849cd505"
+    },
+    {
+      "path": "core/Echo.Core/Duplicates/DuplicateIndexQueries.cs",
+      "sha256": "0940d2709fa341f36b09f0f3511e1a7c600ba91f004b54a53f9b7527d9267405"
+    },
+    {
+      "path": "core/Echo.Core/Duplicates/DuplicateIndexWriter.cs",
+      "sha256": "8079652ad7d3a4ab78bf9de3338c46a1815787588c43aaa5cd1c2536e50e7d20"
+    },
+    {
+      "path": "core/Echo.Core/Duplicates/DuplicateTextNormalization.cs",
+      "sha256": "3bbe3313803b58364da774dc8de8448f8e46098bea318b21c0e0799e35b38a05"
+    },
+    {
+      "path": "core/Echo.Core/Echo.Core.csproj",
+      "sha256": "5e53c067c5065b3562e63e72dc55f0576529307b16fed24e84c5abc973a3669a"
+    },
+    {
+      "path": "core/Echo.Core/Export/DataPackageArchive.cs",
+      "sha256": "6cf4b1b78542f635aac0c65daa6c3b3612ff72a65d445dc44436d3082f29a17f"
+    },
+    {
+      "path": "core/Echo.Core/Hosting/BoundedEncodeBuffer.cs",
+      "sha256": "0da717966af4b5496e3306a10cd455d38710ca6eef167a85febd18c5ea79cf9b"
+    },
+    {
+      "path": "core/Echo.Core/Hosting/CoreExecutionLanes.cs",
+      "sha256": "69c64591b40a78b7ad10219acdf937a310d8c2d94d3bccc433e7d79e638bc2ae"
+    },
+    {
+      "path": "core/Echo.Core/Hosting/CorePerformanceTrace.cs",
+      "sha256": "9249c0f6e42d97fc0da08cbfa0aea9ee118d505cb73af8f13795639badab0947"
+    },
+    {
+      "path": "core/Echo.Core/Hosting/CoreResourceSampler.cs",
+      "sha256": "a314d1326cc812759a35f7643a753bc0affba7f16b3de1e8e2c77a83bed8e924"
+    },
+    {
+      "path": "core/Echo.Core/Hosting/CoreResponseJson.cs",
+      "sha256": "39baef683985ee1d09f1b86c45403e626286f293789afa5172ae7346e1d196e0"
+    },
+    {
+      "path": "core/Echo.Core/Hosting/DatabaseExecutionWorker.cs",
+      "sha256": "117adb58d3f57211246001209de75e8443ee5997531d87ce0bf1071503c19081"
+    },
+    {
+      "path": "core/Echo.Core/Hosting/LocalCoreService.cs",
+      "sha256": "30e031966d2e901a293a0de4f0957d979c02d552228aad9b7bbebd37c632419e"
+    },
+    {
+      "path": "core/Echo.Core/Hosting/LocalCoreServiceListener.cs",
+      "sha256": "535f0f8370d35d0d1194fd7ddbb959f038c22476e851277a933a384ec10f07e2"
+    },
+    {
+      "path": "core/Echo.Core/Hosting/LocalCoreServiceOptions.cs",
+      "sha256": "559ee8658d6c06bb38a5d88f4329c62c80c43999b2c14cc4bcc2d7d89c72bb1d"
+    },
+    {
+      "path": "core/Echo.Core/Hosting/ManagedServiceLifetime.cs",
+      "sha256": "56f7a58b29a67691018683a3378e312d8ef4d874e355ef16d564a6ddf35f6ba8"
+    },
+    {
+      "path": "core/Echo.Core/Hosting/RequestExecutor.cs",
+      "sha256": "c5188b05ed06d8bc01b512662045d32da195cde8c0d79f9702c775137de0572d"
+    },
+    {
+      "path": "core/Echo.Core/Hosting/ScanWriteExecutor.cs",
+      "sha256": "a8f00242d616acdabf840b888ccdf047dfafe6cbe101121e82f2be7a0f79628b"
+    },
+    {
+      "path": "core/Echo.Core/Hosting/StdioServer.cs",
+      "sha256": "893115b0822ef5ec6c727daa5a2086dcfa3174e1d59eded14b8de10dd0cddd67"
+    },
+    {
+      "path": "core/Echo.Core/Maintenance/GenreMaintenanceStorage.cs",
+      "sha256": "569ce212de039c88f097462951af19639223fabf605d0c48e84cd930bda4c165"
+    },
+    {
+      "path": "core/Echo.Core/Maintenance/GenrePageMaintenance.cs",
+      "sha256": "44c6ac5cbab45a8bd803d61c8b044b26f0900eb2ce548660aa9e931ea6f508da"
+    },
+    {
+      "path": "core/Echo.Core/Maintenance/SortKeyBatchReader.cs",
+      "sha256": "bcb30f7d1f6cfccd9006ea89d5527ca28db9f2117db66bdc0b3b047a104122ca"
+    },
+    {
+      "path": "core/Echo.Core/Maintenance/SortKeyMaintenance.cs",
+      "sha256": "5f47e089f21fb7712840c0915d1fa978a49fb24013f23168ef50371f1d5f214d"
+    },
+    {
+      "path": "core/Echo.Core/Maintenance/SortKeyMaintenanceSql.cs",
+      "sha256": "af4ce7375df93639adaca87687933669b520f52b8badceb80b5cbe290aaca277"
+    },
+    {
+      "path": "core/Echo.Core/Maintenance/SortKeySchema.cs",
+      "sha256": "79a0aef97d8a47adeb501331560be9fbc5d1b4ac83304d9d892ad18f637948d5"
+    },
+    {
+      "path": "core/Echo.Core/Maintenance/SortKeyWriter.cs",
+      "sha256": "6dabae5639eb51c5b265a5fca01ebca31f69c6513856224eab4b6765e91661bd"
+    },
+    {
+      "path": "core/Echo.Core/Mapping/AlbumRowMapper.cs",
+      "sha256": "24e0401d413e77f851d128561de6b5e893948b201a156e9ee9f1e7aede9f3465"
+    },
+    {
+      "path": "core/Echo.Core/Mapping/ArtistRowMapper.cs",
+      "sha256": "26ff0f23ae70c209ea24f626406c506ac05fce73599cdc80654641955a6a82a1"
+    },
+    {
+      "path": "core/Echo.Core/Mapping/DefaultCoverLookup.cs",
+      "sha256": "cbc6f8fa9da80eef7c9f88a423295ec83bb21d3d2015bf9b0b09d0766cb21cd6"
+    },
+    {
+      "path": "core/Echo.Core/Mapping/GenreRowMapper.cs",
+      "sha256": "ba7eebc627df737bd28b4820161214ea3e887904eb144ece3746be2fa3ae1e66"
+    },
+    {
+      "path": "core/Echo.Core/Mapping/LibraryText.cs",
+      "sha256": "577d41a4ee1c4ab8b96b79fe84336abaab46c29923883a730f5068b761067dfa"
+    },
+    {
+      "path": "core/Echo.Core/Mapping/RowMapperColumns.cs",
+      "sha256": "7efdb6aec0e02e1593258b504723a49ac70481823a04766931e98a3c304bb881"
+    },
+    {
+      "path": "core/Echo.Core/Mapping/RowMappers.cs",
+      "sha256": "a581be7515c9fe631e357d6f35cf0ef526d0e07acd055b97d17e84aeb5d6c425"
+    },
+    {
+      "path": "core/Echo.Core/Mapping/TrackListRowMapper.cs",
+      "sha256": "37b8971c565472c87bcb66f914b1c69a07b8d602733a907e7798681c98d16a82"
+    },
+    {
+      "path": "core/Echo.Core/Mapping/TrackRowMapper.cs",
+      "sha256": "a128ee7ee5667e596ce940a3d6919b2e942fc998b47d157dfa94537629909e1e"
+    },
+    {
+      "path": "core/Echo.Core/Media/AsciiSearchTerms.cs",
+      "sha256": "6d09734c5f26edc432aec4a3fb4feba73f6ffee73f1d4e078f7b35c13ba5f785"
+    },
+    {
+      "path": "core/Echo.Core/Media/CoverCandidateResolver.cs",
+      "sha256": "c9e54b9f6cd3d2c0b4c803d4632c14afaa8d12c2cbf3add844ae916dc713ff0c"
+    },
+    {
+      "path": "core/Echo.Core/Media/CueAudioSource.cs",
+      "sha256": "6c8fe1ba5d43950944d95894aebf81ad398e51e478d2a3152112c03c5c882426"
+    },
+    {
+      "path": "core/Echo.Core/Media/CueSyntax.cs",
+      "sha256": "66a5a01b2cb21e8b10574977491d6b193eed6fedd9dab78bbf88b8ff447f5ed5"
+    },
+    {
+      "path": "core/Echo.Core/Media/CueTextDecoder.cs",
+      "sha256": "e2594a64490840ee0a7e92a2fcf331cb3d2491a982c80556b85ba44c390a011d"
+    },
+    {
+      "path": "core/Echo.Core/Media/FlacBinaryCueSheet.cs",
+      "sha256": "481686374fdc7dec755bccf82db07f7e173e000a5681eae48781485dfece860d"
+    },
+    {
+      "path": "core/Echo.Core/Media/NativeMetadataProcess.cs",
+      "sha256": "e7a20367df251e57b35f451ea8aa2036e850ea4fe42b54f910acd487a8187e0d"
+    },
+    {
+      "path": "core/Echo.Core/Media/NativeMetadataProtocol.cs",
+      "sha256": "7cfca83ca66b40800832067ca284c91705c98328ec5f800299a5a07abf24a3cd"
+    },
+    {
+      "path": "core/Echo.Core/Media/NativeMetadataReadException.cs",
+      "sha256": "921c35ecc30b3512d79cb908a7cc228792793a2556d6e490e88c8deb60c0aaa0"
+    },
+    {
+      "path": "core/Echo.Core/Media/ScanCueBatchLimitException.cs",
+      "sha256": "4aec073ee85683d878b3364f5832063af68b3769161c1cbe21ca46d77e193a6f"
+    },
+    {
+      "path": "core/Echo.Core/Media/ScanCueParser.cs",
+      "sha256": "0f97d34bb3b3f7c5223fa197e106a9e6b7284ac023a9ac23185d1d6c407bb6db"
+    },
+    {
+      "path": "core/Echo.Core/Media/ScanCueReader.cs",
+      "sha256": "8bf67f564cb76d9021b65beff44dd4f6c928c0d1bfdec7b7df932de03b59d046"
+    },
+    {
+      "path": "core/Echo.Core/Media/ScanCueValidation.cs",
+      "sha256": "c83bae6f40a2a1cc091074027fb7fd685663dc7c3c59f8576e8dbbcdadbd551d"
+    },
+    {
+      "path": "core/Echo.Core/Media/WindowsScannerProcessOwnership.cs",
+      "sha256": "703a339992b3db454d9c219fafb7d2dad3ba2e403d78a1b5d7a2182050f2faff"
+    },
+    {
+      "path": "core/Echo.Core/Personal/PersonalTagCommands.cs",
+      "sha256": "8274103b02e447bc33d01b4d56f922c5501de163e08cb5b0da6148bdc1497c93"
+    },
+    {
+      "path": "core/Echo.Core/Personal/PersonalTagItemsQuery.cs",
+      "sha256": "843dfb61842ca13673d615686d027898a0b0c63c6f3e08d0036ac9fc7da83a4d"
+    },
+    {
+      "path": "core/Echo.Core/Playback/PlaybackCommands.cs",
+      "sha256": "83a5bbaf05c2af811b78a46f9adaea82109e08cc3f94cfdcc8983ee4166b5870"
+    },
+    {
+      "path": "core/Echo.Core/Playback/PlaybackHistoryWriter.cs",
+      "sha256": "5bff5dd347cd382de20ae30de726a20f49f81689d2febb9272267e511c079ec4"
+    },
+    {
+      "path": "core/Echo.Core/Playlists/FavoriteAlbumRepair.cs",
+      "sha256": "3f1cafa5b393851bb9cb8bc83fca8744a4a46360d02cf99aef142b910da28e36"
+    },
+    {
+      "path": "core/Echo.Core/Playlists/FavoriteCommands.cs",
+      "sha256": "7278d714ed54ccc62173340ec338d1f3076d2888420c91974b9c714cac03f75f"
+    },
+    {
+      "path": "core/Echo.Core/Playlists/InboxPlaylistCommand.cs",
+      "sha256": "618a578e624a6a22ab07baa01a66045dc451a9611441d3aa69bc0c5cb4fa818d"
+    },
+    {
+      "path": "core/Echo.Core/Playlists/PlaylistBackupWriter.cs",
+      "sha256": "dbe673be3d8285ede061b94a4a6cfbe9d44232c0116c998fd9c6a584db621762"
+    },
+    {
+      "path": "core/Echo.Core/Playlists/PlaylistCommands.cs",
+      "sha256": "b21bffefaa428f61844f600f259f1c0f51b7c15727c2860f1d382e89a5237e3f"
+    },
+    {
+      "path": "core/Echo.Core/Playlists/PlaylistGroupCommands.cs",
+      "sha256": "e0ffbb10b3a372b7f0996ba7d78ef08196688698ea059343cc07a64b27289821"
+    },
+    {
+      "path": "core/Echo.Core/Playlists/PlaylistInspection.cs",
+      "sha256": "2ed25a61e864ee86a87fb55694b79e602b7d68ac13dd76c151b69bbb19964b16"
+    },
+    {
+      "path": "core/Echo.Core/Playlists/PlaylistManagementCommands.cs",
+      "sha256": "2fd40e86c726204b01b78834bc90e55956e280f72288f4173a0ec4e9488c72a8"
+    },
+    {
+      "path": "core/Echo.Core/Playlists/PlaylistRecovery.cs",
+      "sha256": "2f93580343d152ca2092f6329bf731eab42ab9f3a4097bf102a9ac7d0381e012"
+    },
+    {
+      "path": "core/Echo.Core/Playlists/PlaylistSql.cs",
+      "sha256": "f9934b7a47c5b8b2c66670e644f3a998e388b0c4575f0dbd72da155b45d4af86"
+    },
+    {
+      "path": "core/Echo.Core/Playlists/PlaylistTrackCommands.cs",
+      "sha256": "46e6782530392ef6c98778927d969958f1748b9ac640daa017291197a2a93ce4"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/AsciiSearchMessages.cs",
+      "sha256": "bdd286488eead5fe4a3fa7753188d05b801fd0decc71e32aa5efcb60c488b434"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/CoreAlbumFocusCriterion.cs",
+      "sha256": "816ae2c159514ceed7abac2c9f190ae25c6e7769b761567c7a0da518137b7576"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/CoreInboxMessages.cs",
+      "sha256": "b11863d2c7a102be770c3d7a18d343b7890b2150cae0d80425335d0cfcd396d3"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/CoreJsonContext.cs",
+      "sha256": "e2f4305d8bd4f92555454e309ea0e33cc114478035d1541899effdc218c17d70"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/CoreMessages.cs",
+      "sha256": "3e357adf20af1f8ad422d2d2b2a20f1f8069127576ca040e8f75b4aeca6b03ba"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/CorePersonalTagMessages.cs",
+      "sha256": "bcf8ae950814bfa1444a5f2d6e0ad53a81c3aeee65a4f8ef1f2b5b8bac127e8b"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/CoreQualityMessages.cs",
+      "sha256": "885f638886d93502326f1da0d287b7caea22105dad9f742afba546171358dccc"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/CoverCandidateMessages.cs",
+      "sha256": "785eaa11d7d99860207902446f7ca372219f2fbb1dfbc47ed698f87dcee8e4b4"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/CueTrackRefsMessages.cs",
+      "sha256": "25c324c4ddf32a982b2739193dbe89e88bf2cf68017dbc90d0aa465db6dc17c1"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/FolderChildrenMessages.cs",
+      "sha256": "8a7203826d4f56a4a7104d1116327c62055759e3d798e0b3d83aecb16db097b4"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/FrameCodec.cs",
+      "sha256": "653ae8b8e3f17e247b3fa361bfffad9681361777a3335013a1d445ab7560da22"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/IRecoverableCommand.cs",
+      "sha256": "21258023c056464ffb586f517f065dfe67041831a18f6888af8e09890f14b5f1"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/LibraryMutation.cs",
+      "sha256": "90c610d26eeb2b6dcc1278dee56c2af473d1ff1ba3e893a1b5d390d20552f96b"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/LibraryTrackDto.cs",
+      "sha256": "fe6b253dea0a202873659e6bd5bc17cb70f62925b0c333f61a0d385e1f50f3fc"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/LibraryTrackListRowDto.cs",
+      "sha256": "301d8c51d9a140c746f27fbaf8a2da9da89c6b8e636357d8de4431e923c98a4b"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/NativeMetadataMessages.cs",
+      "sha256": "5a71509fd91fa376d47a55e05a5f90655a99283da198fb66231db3ba70e8c1cd"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/PersonalTagCommand.cs",
+      "sha256": "3f1765554891c82e0081a901d7b7b9e7c1e66714c745420df6649c1800a69bf1"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/PlaybackCommand.cs",
+      "sha256": "386defe92aefb19a947a533050ed4636a3d32a6924d2e40095f1c479a0699199"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/PlaybackHistoryDaySummaryDto.cs",
+      "sha256": "34dc2514cc98c1c31bc9d7f61b9890b7d9e09cfde4f41792cc2fe0d279d7622f"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/PlaylistCommand.cs",
+      "sha256": "7f135567c6827f0e387e4f7992f865a8b25a6957ba82b2ded72d5918c79a4266"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/ProtocolConstants.cs",
+      "sha256": "02a96e7439d90467abd5bafc66ffe7ec26bf3fc15e0e632c57e16ae1ca7187b2"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/ScanAlbumCoverRefresh.cs",
+      "sha256": "3989d31b5a0f7f1a6de3b7dda34b0691fd58c233a70c6007704e4407563445f5"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/ScanCacheStateMessages.cs",
+      "sha256": "bffdb4c8532337ab201804cf26fef7db229bf33cea87f4e75cccea27474829e4"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/ScanChangedFilesMessages.cs",
+      "sha256": "cfd188005c392c270b1a374d72aae99fa7064bff832064e7514c0451713ca5c6"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/ScanCheckpoint.cs",
+      "sha256": "4f38a34718875e6e33f337d5cee28f3bdb107164a7e076f92df96c345d1577b4"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/ScanCueMessages.cs",
+      "sha256": "1af91941e9ec21793adb909191972b67b2024ba50b1a6e0cc35ad2c17c032d29"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/ScanFinalizeCommand.cs",
+      "sha256": "799a62d8ec4029693e79070c88225f6f6e18fd3caafaf6002969ca5745015773"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/ScanJobCommand.cs",
+      "sha256": "08f86e50af6a09fd59b9b6b95da438c9ccfc7705e40df8e879c9940813868c76"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/ScanMarkedMissingMessages.cs",
+      "sha256": "0446406870da14969bf70aadee2cbc38d6a3c765bec07de6bcabc6afed2234db"
+    },
+    {
+      "path": "core/Echo.Core/Protocol/SortKeyMaintenanceMessages.cs",
+      "sha256": "ae901437a3a17c0b7f01be20c2d30e574940e093f0b01a7233fdcd9032a3cd10"
+    },
+    {
+      "path": "core/Echo.Core/Query/AlbumFocusCriteria.cs",
+      "sha256": "061553de036270d7fe845a4dad9522f909a4a13fec43e5cd2070c7bc1694e4b3"
+    },
+    {
+      "path": "core/Echo.Core/Query/AlbumFocusFacetsQuery.cs",
+      "sha256": "aabd51a1e36cba5d2a4b90a911ac0f325f5fef7ea5f69864163576ce90735f1c"
+    },
+    {
+      "path": "core/Echo.Core/Query/AlbumFocusSql.cs",
+      "sha256": "89d5dbf63d905034ee27ba6210f16c7ac5dcd01af4f29fb15458f69b4ecfe61f"
+    },
+    {
+      "path": "core/Echo.Core/Query/AlbumForTrackQuery.cs",
+      "sha256": "b492b9f94bb508ee71a5dd82c237ecca086405a86d83eb9729c73c3108a74325"
+    },
+    {
+      "path": "core/Echo.Core/Query/AlbumPageQuery.cs",
+      "sha256": "58081c6b03c0e7493b29a84bb3f01db18e8e42abb636e530738c451a2dc52566"
+    },
+    {
+      "path": "core/Echo.Core/Query/AlbumTrackPageQuery.cs",
+      "sha256": "761d6ec3e5e538f9ed6004fe918915e54378cad99ce3f0decdc84ed190018384"
+    },
+    {
+      "path": "core/Echo.Core/Query/AlbumVersionVisibility.cs",
+      "sha256": "56ccb596210f684a24e660f80e6ff6e748abc6b6924428841df937a65648cfa8"
+    },
+    {
+      "path": "core/Echo.Core/Query/ArtistAlbumPageQuery.cs",
+      "sha256": "6227b32606f6dd6c188684e3a336e32c9efc868ade76934d6fbff82262b5d6b4"
+    },
+    {
+      "path": "core/Echo.Core/Query/ArtistCredit.cs",
+      "sha256": "add1993251018e210f90108f9006034428e03d7af04824e811e1373cfdbcfd2b"
+    },
+    {
+      "path": "core/Echo.Core/Query/ArtistPageQuery.cs",
+      "sha256": "dcc3a20004d729b8d29a8b9a482f14014351dc8699b6f2b9a146472e6e540d9d"
+    },
+    {
+      "path": "core/Echo.Core/Query/ArtistTrackPageQuery.cs",
+      "sha256": "89fe15dc9286fd83bbf00195f830f4844a2ffd0929b2b14b161e3d2d012e35da"
+    },
+    {
+      "path": "core/Echo.Core/Query/CueTrackRefsQuery.cs",
+      "sha256": "d68ff39d3e03bcacaf17c8acfb7dedf85f5a59e46074bb9011e44127a818fc2e"
+    },
+    {
+      "path": "core/Echo.Core/Query/ExistingTrackPathsQuery.cs",
+      "sha256": "43cf28b25ad55871ad832bdbb92ff4a6c706a503a22a110d7b60ba108e86e426"
+    },
+    {
+      "path": "core/Echo.Core/Query/FavoriteItemsSql.cs",
+      "sha256": "613f3bfbd96ad04de4b14a3a4b12ddd9d64300e985b17eef28544763c54f352b"
+    },
+    {
+      "path": "core/Echo.Core/Query/FolderChildrenQuery.cs",
+      "sha256": "9219143dbd768830b170643619b0313741818aac9852ce81d65aee9cdcf0627c"
+    },
+    {
+      "path": "core/Echo.Core/Query/FolderCoverSelection.cs",
+      "sha256": "0482b04b0852554fa4583d6d68352d5e0281ae8e2617d371c2fed4d778e0ce70"
+    },
+    {
+      "path": "core/Echo.Core/Query/FolderInsightSql.cs",
+      "sha256": "4c91bc5ba1e7bad8c1a531c52a506c123f2e58bea2394ceabbe67d23e52c7a8d"
+    },
+    {
+      "path": "core/Echo.Core/Query/FolderOverviewQuery.cs",
+      "sha256": "6d1dceecd4ecca2f5af5b554739ff8f0a76370dfda8daf8384e9024ec450e391"
+    },
+    {
+      "path": "core/Echo.Core/Query/FolderPathScope.cs",
+      "sha256": "9690ff2b035c25e3d23e4dc1fb1c2b4fcf392e5c65ef7c606b3cf626856dfad1"
+    },
+    {
+      "path": "core/Echo.Core/Query/FolderTracksQuery.cs",
+      "sha256": "69944be89388843403100968b81b67859cdef6227fa06c67829e65456af22e91"
+    },
+    {
+      "path": "core/Echo.Core/Query/GenreAlbumPageQuery.cs",
+      "sha256": "886fdd82a65a28a00c6a870410a28502a2bc6c7354b5fdfc4e48fc25d7201167"
+    },
+    {
+      "path": "core/Echo.Core/Query/GenreKey.cs",
+      "sha256": "b9a4a90699cbeda49f9eb95118e5f0f16aea7495da658f44c22debd50e331406"
+    },
+    {
+      "path": "core/Echo.Core/Query/GenrePageQuery.cs",
+      "sha256": "00a543cb9e4098c69b9e55fa14c8d1d27aab9e379f1c2880cb37ed315c3164b5"
+    },
+    {
+      "path": "core/Echo.Core/Query/GenreTrackPageQuery.cs",
+      "sha256": "bc46b3010aa5c4c12e91bbb19650f67a748e04106434ca57bb439e7e3258062b"
+    },
+    {
+      "path": "core/Echo.Core/Query/InboxAggregates.cs",
+      "sha256": "a8bf8be3f9de12bf980c2cf7c25ca54c1073125e3e8936f509da55f3bb60c175"
+    },
+    {
+      "path": "core/Echo.Core/Query/InboxBatchQuery.cs",
+      "sha256": "400f770a12de9e837cd1fa6c261c3fe938a2b6cdb7bfac66f09b3bed9683ad9a"
+    },
+    {
+      "path": "core/Echo.Core/Query/InboxPageQuery.cs",
+      "sha256": "4fbbb0f8db734b2ad8df444b5a9476824554512275e4a668d30956ad0dc6e8b1"
+    },
+    {
+      "path": "core/Echo.Core/Query/InboxReasons.cs",
+      "sha256": "193e498ba2b7a03bd3bd2cd5747ca0385543aab0f58a8e37f37ac8437846d271"
+    },
+    {
+      "path": "core/Echo.Core/Query/InboxSelection.cs",
+      "sha256": "1174c9fedf9fe6c8fd411012b370911df966feeb357cee93c010ef281f15450b"
+    },
+    {
+      "path": "core/Echo.Core/Query/LibrarySummaryQuery.cs",
+      "sha256": "54ccd52372b4ddd6e414f14d56a96f86176da5a0b9ed959f36f9df0be67f11a0"
+    },
+    {
+      "path": "core/Echo.Core/Query/LikedTrackIdsQuery.cs",
+      "sha256": "fa05771bb6513f0c870015e711084eabf6dbe991436704ceebc01448f035fa50"
+    },
+    {
+      "path": "core/Echo.Core/Query/PageQueryNormalizer.cs",
+      "sha256": "f897c4b2576694d3aef8c34c7e3c580f289bd2d88ec0abdc1b49184320f790b0"
+    },
+    {
+      "path": "core/Echo.Core/Query/PageTotal.cs",
+      "sha256": "170c148182ecb59c523fbef44e259aa566d655a090a9af4eb754c81750a2a2ed"
+    },
+    {
+      "path": "core/Echo.Core/Query/PersistedSortKeys.cs",
+      "sha256": "9f66ba60673c265b4ec149ebb4dd3a552beaa9e845cac52930f1a84652765c99"
+    },
+    {
+      "path": "core/Echo.Core/Query/PersonalTagAlbumSql.cs",
+      "sha256": "43a79a48a62414f3647e60097be0e519a667226db6d03fa2aa9977950a64d4e3"
+    },
+    {
+      "path": "core/Echo.Core/Query/PersonalTagListQuery.cs",
+      "sha256": "c30e91108870bc354a7eb25298a7365d1ec1d9da9d1f5b9ba9ddaec2cd72de81"
+    },
+    {
+      "path": "core/Echo.Core/Query/PlaybackHistoryDaySummaryQuery.cs",
+      "sha256": "3d01375077fc529309f685d6fd295cf946f01af54b8baf939d69c10a4c256113"
+    },
+    {
+      "path": "core/Echo.Core/Query/PlaybackHistoryFilter.cs",
+      "sha256": "2110995aa96b3f83464caf6bf31895fccad14c2bf5130111c2f48440149f3e22"
+    },
+    {
+      "path": "core/Echo.Core/Query/PlaybackHistoryOrder.cs",
+      "sha256": "c7500bf013951ff8a6c3277ae1144f72185287110b06748558588789ecbf780b"
+    },
+    {
+      "path": "core/Echo.Core/Query/PlaybackHistoryPageQuery.cs",
+      "sha256": "f1c4476457332e5d8ce25a5a937679350e4df86e3f3af10ba8c0c13a9f381059"
+    },
+    {
+      "path": "core/Echo.Core/Query/PlaybackHistoryRecordsQuery.cs",
+      "sha256": "193bbede7a063b2f6e8e353910a7fa5f3f213def831a4cc4c7ea949b8f9532b9"
+    },
+    {
+      "path": "core/Echo.Core/Query/PlaybackHistorySummaryQuery.cs",
+      "sha256": "9dbebc5c185ee40f48a199eec137c5531630750d3dfaadac42b84a0f103ccf3a"
+    },
+    {
+      "path": "core/Echo.Core/Query/PlaybackMemoryGraphQuery.cs",
+      "sha256": "8cb49071d1ef0cbc9ef5dd0ed5357732c7a16f3425d01724b16fdbdf028984cf"
+    },
+    {
+      "path": "core/Echo.Core/Query/PlaybackStatsDashboardQuery.cs",
+      "sha256": "07ba8dfab475797bab29b5270f6eebd7e5fb6c738e15edc4db19fb88f3712fa3"
+    },
+    {
+      "path": "core/Echo.Core/Query/PlaybackStatsInsightsQuery.cs",
+      "sha256": "cb9186d706a6c99db23a7bfd8c59b724f8064279fa2200b8ef2e6ef5f71c8185"
+    },
+    {
+      "path": "core/Echo.Core/Query/PlaylistCommandResultQuery.cs",
+      "sha256": "d815a02f10c2365780d9e0ead62c2ddf6347d0b5539ecaf749ea724f3c1d909e"
+    },
+    {
+      "path": "core/Echo.Core/Query/PlaylistCoverQuery.cs",
+      "sha256": "557f59780ddb495ae76ac15346ac76942301be695f97b4415ed54edffd6565d6"
+    },
+    {
+      "path": "core/Echo.Core/Query/PlaylistItemsOrderSql.cs",
+      "sha256": "52a13ab119f8526c92e6b40995a2693779d414cdd1d9a623f170704987726d52"
+    },
+    {
+      "path": "core/Echo.Core/Query/PlaylistItemsQuery.cs",
+      "sha256": "dc4f4a595babf50d23f8d4a8e26e74afdb74c3c929d1bfa2dd311cfde32cab3e"
+    },
+    {
+      "path": "core/Echo.Core/Query/PlaylistListQuery.cs",
+      "sha256": "f95c18940106b88fb092a009e90537083d8e334a6c11f0eb6c55a11de0cac7f1"
+    },
+    {
+      "path": "core/Echo.Core/Query/PlaylistSnapshotOrderSql.cs",
+      "sha256": "36b1ad6bd1a706d8a333e0acfa853fdbe63833fd8af4808e160a51a2ef99e73b"
+    },
+    {
+      "path": "core/Echo.Core/Query/PlaylistSortKeysNotReadyException.cs",
+      "sha256": "62562be7c27a93cd356b35d8761f9750c948b0c7d62d4598a9e0a17ea0a3425f"
+    },
+    {
+      "path": "core/Echo.Core/Query/QualityIssueQuery.cs",
+      "sha256": "b222089888f9abb6ea84aece0d87e13f7ffb5fd762fe02b5460eb1bcaf328931"
+    },
+    {
+      "path": "core/Echo.Core/Query/QueryCapabilities.cs",
+      "sha256": "36f380660230fa7944ccb89812c2de25e9acb60b6ec657d187193e93e0fe9bf2"
+    },
+    {
+      "path": "core/Echo.Core/Query/QueryPlanDiagnostics.cs",
+      "sha256": "0c587a7cf19ceaf40542bb541d1298835e579c925f362695114d268436ee625f"
+    },
+    {
+      "path": "core/Echo.Core/Query/ScanCacheStatesQuery.cs",
+      "sha256": "72445f88eced0e803ff60df34326899d5affacc9de17339018dbfcb6e09ec264"
+    },
+    {
+      "path": "core/Echo.Core/Query/ScanChangedFilesQuery.cs",
+      "sha256": "0e0392f2679d20f4db2ab809b4151b5c00a673e2909e24390219ec11ff2beec3"
+    },
+    {
+      "path": "core/Echo.Core/Query/ScanMarkedMissingQuery.cs",
+      "sha256": "49c1954f27256efdddebc15db89c7a3e911345efa160fd1f62fd118c0a2d4849"
+    },
+    {
+      "path": "core/Echo.Core/Query/SearchContract.cs",
+      "sha256": "c706b4a5f847e69c2f9d7e8f4a224ea5c5a409586dee2a0565ca0410be9ca8eb"
+    },
+    {
+      "path": "core/Echo.Core/Query/Sql/AlbumDisplayCoverSql.cs",
+      "sha256": "9dc0dff7f82f1329078c429bcac22ff187d82b30ee0542bb771ec81e8a8d47b7"
+    },
+    {
+      "path": "core/Echo.Core/Query/Sql/ArtistAlbumOrderSql.cs",
+      "sha256": "6afffa1d43e85b9cdfecff0a75fce8f9ac3056fc818cfccd09bd40461202f45c"
+    },
+    {
+      "path": "core/Echo.Core/Query/Sql/ArtistAvatarPrioritySql.cs",
+      "sha256": "f1acf75e80be6f437cfa1c86f03c933e3381bb5ff83ee4e72a7b0455cc5a866f"
+    },
+    {
+      "path": "core/Echo.Core/Query/Sql/CachedQuery.cs",
+      "sha256": "56e8fe7ea1e09af1fad30f74afd6425c10449e5844fb76060d4e8ab8fbe1eb66"
+    },
+    {
+      "path": "core/Echo.Core/Query/Sql/IndexedTrackTitleSql.cs",
+      "sha256": "60b8e89a5f480d375f3c6f28c20373fee7c840b9d44a8ce10798df7e61d8dbd2"
+    },
+    {
+      "path": "core/Echo.Core/Query/Sql/SqlFragments.cs",
+      "sha256": "8b4d14b7aba8bc04935003a029df72f03c0d5f4f88856d441428cafb352b7305"
+    },
+    {
+      "path": "core/Echo.Core/Query/Sql/TrackOrderSql.cs",
+      "sha256": "40becac91111ac2301c4dd0b987f8d738b060fe342ef3e8a3010909da859ba5c"
+    },
+    {
+      "path": "core/Echo.Core/Query/Sql/TrackSelectSql.cs",
+      "sha256": "93be5464ac25e7ef0fff7b1d1bef6d70882486b7bfb5e2f1f5e304c2b4487acf"
+    },
+    {
+      "path": "core/Echo.Core/Query/Sql/VocalPresenceSql.cs",
+      "sha256": "313533dc0c994e1aff06e50e82ab3d0eced0511782050b39377b596fb0a671e3"
+    },
+    {
+      "path": "core/Echo.Core/Query/SteamAchievementHistoryStatsQuery.cs",
+      "sha256": "33b82b95c4d6f7f91c9e261020d6c8e11a767a70b47801c1997283de2d658581"
+    },
+    {
+      "path": "core/Echo.Core/Query/TrackByIdQuery.cs",
+      "sha256": "22b6db04d86885854e0f6d159a79547571605fbd2e71ca5ed59f2cfba2cb0631"
+    },
+    {
+      "path": "core/Echo.Core/Query/TrackPageQuery.cs",
+      "sha256": "27fbec3f973a07953afde0160bd464270e4b762c8ed0ee9d6a54c228187b444a"
+    },
+    {
+      "path": "core/Echo.Core/Search/ChineseSearchVariants.cs",
+      "sha256": "c6c3b8cbe07b808a138a29a3f1ff889295e4600b6374d1b155469e023956cb73"
+    },
+    {
+      "path": "core/Echo.Core/Search/Data/OPENCC-LICENSE.txt",
+      "sha256": "034ba71a169f194945b57a8f494f3b2cfa32dd77c98ef3db466cfc7eb51f3ded"
+    },
+    {
+      "path": "core/Echo.Core/Search/Data/OPENCC-THIRD-PARTY.md",
+      "sha256": "3173c2c91bc80a93afa62fb40ea14d7eadb206350106446167901c6472515c6d"
+    },
+    {
+      "path": "core/Echo.Core/Search/Data/opencc-search.json.gz",
+      "sha256": "319b6cca7353e1bf166d259c83b87781c17e5715293491b3561b2166a14498a1"
+    },
+    {
+      "path": "core/Echo.Core/Search/JapaneseSearchVariants.cs",
+      "sha256": "541f353f3d065e6fa7889e1ed6314adddb4ae12be5f508d9b1be616ca76187da"
+    },
+    {
+      "path": "core/Echo.Core/Search/LibrarySearchNormalizer.cs",
+      "sha256": "a97fb54e4343e3bd559bb86d7888af8dffb34a7074be319351afb6d23b664886"
+    },
+    {
+      "path": "core/Echo.Core/Search/LibrarySearchParser.cs",
+      "sha256": "1a61fb067eb2697ee4afbd3f33be6c493f83f003076f69ecf1071df60ba89a84"
+    },
+    {
+      "path": "core/Echo.Core/Search/SearchUnicodeRanges.cs",
+      "sha256": "e04e7c10f84d260c72b825e4db746396da6a2eb0889b5dbedaa2a6b5923f7281"
+    },
+    {
+      "path": "core/Echo.Core/SmartPlaylists/SmartConditionSql.cs",
+      "sha256": "69872e10a9b4145b7b61884bfac87585c8e86d2132a71b2bbcdee12ddd048a81"
+    },
+    {
+      "path": "core/Echo.Core/SmartPlaylists/SmartPlaylistCommands.cs",
+      "sha256": "f5f02ee3f6742a73b9fbbc2c087aafc3ae3755bd1e2500ed5b5d2942a7e8e356"
+    },
+    {
+      "path": "core/Echo.Core/SmartPlaylists/SmartPlaylistQueries.cs",
+      "sha256": "f5af11a4264c3a9d401c0e62918530ee58dfd3fef8cecd31066707bbb6b0b188"
+    },
+    {
+      "path": "core/Echo.Core/SmartPlaylists/SmartRuleNormalizer.cs",
+      "sha256": "8f389e6e9dcf17a51155cd2bb6759ec1662549bbb36d5b22eb7356876e5e9feb"
+    },
+    {
+      "path": "core/Echo.Core/SmartPlaylists/SmartRuleSql.cs",
+      "sha256": "67a1deda33b6cce2c0b1aae729f1e4d4729cd15263bdd19be711065537ab2303"
+    },
+    {
+      "path": "core/Echo.Core/SmartPlaylists/SmartRuleValues.cs",
+      "sha256": "9ec94c4a1a45dccad031e0bff7148e3e8c5e0479b48d01c1b64331b9dec0fbf2"
+    },
+    {
+      "path": "core/Echo.Core/Writes/CleanupWriter.cs",
+      "sha256": "a91540bc52ef540444e5aa38cee4599a9b3d7e1de4b8371d7cbc7b9d67d9df9d"
+    },
+    {
+      "path": "core/Echo.Core/Writes/InterruptedScanJobRecovery.cs",
+      "sha256": "be174514c84d4e2100f0f968854b9eb2b64b83c1b5f0f0fd7034e10287ba89f6"
+    },
+    {
+      "path": "core/Echo.Core/Writes/JsonFields.cs",
+      "sha256": "663cf36f1c77f1041b2267b8a8bc590ff4409666f35bb6dc9d8a0b438fe1ac8d"
+    },
+    {
+      "path": "core/Echo.Core/Writes/LibraryMutations.cs",
+      "sha256": "6c41c9cfb5ffa3cd6caab596d9fc0f0c79d08b1f381b2a67bb00ca51b50ffe82"
+    },
+    {
+      "path": "core/Echo.Core/Writes/ScanAlbumCoverRefreshWriter.cs",
+      "sha256": "b70deeefc34ca7a775e249340f77f8db41b20f1073d62eed0e48f05bcf1b9393"
+    },
+    {
+      "path": "core/Echo.Core/Writes/ScanArtistRefreshWriter.cs",
+      "sha256": "4a8496b3b04e95935596b5b0d0985a4cca63dd9880690ff52e9b87b4bafd9f96"
+    },
+    {
+      "path": "core/Echo.Core/Writes/ScanCommittedCounts.cs",
+      "sha256": "0ada50470332db05463d73bff78231f0774a7bf245f6454c88b760c671eb2e0d"
+    },
+    {
+      "path": "core/Echo.Core/Writes/ScanCoverWriter.cs",
+      "sha256": "2f516c517980c6023cdc098cda26649d1deea356fbcdd236f542925a8ad805da"
+    },
+    {
+      "path": "core/Echo.Core/Writes/ScanExecutionCheckpoint.cs",
+      "sha256": "509e13953aac9aa3f80796fedf5accb6362e2849f3dd7862227c98af2e78c090"
+    },
+    {
+      "path": "core/Echo.Core/Writes/ScanExecutionDispatcher.cs",
+      "sha256": "936b45863b36678449260482a4b638cd6ff7d2dd74f625a7bb29382a6ade7b74"
+    },
+    {
+      "path": "core/Echo.Core/Writes/ScanFinalizeWriter.cs",
+      "sha256": "a45f15473fc5f121cf96da8ad0b9dbb601d02f0388f5ee445a92d90d003cf18c"
+    },
+    {
+      "path": "core/Echo.Core/Writes/ScanIdentityWriter.cs",
+      "sha256": "1656cf90bffd9a4ce3c9bb652235df6310fc78bf6e24b189c75477849e217a08"
+    },
+    {
+      "path": "core/Echo.Core/Writes/ScanInboxStaging.cs",
+      "sha256": "fe0e7cc29ced0bcb1fefac69634a6d44a18d6399abc872582286db5f514d3aff"
+    },
+    {
+      "path": "core/Echo.Core/Writes/ScanJobWriter.cs",
+      "sha256": "397ddc35ba6ef342f9b25fcebd911d05bd6d0f0e35d75ac9ade2136a9d336c20"
+    },
+    {
+      "path": "core/Echo.Core/Writes/ScanMissingWriter.cs",
+      "sha256": "acab14b175eed58b362301f7b63df0dd7c7c77a1cadcfb01d36dc5b0ecf497a4"
+    },
+    {
+      "path": "core/Echo.Core/Writes/ScanMusicGraphWriter.cs",
+      "sha256": "3b5c3d25a01fa345567e3b455aeb3db7afd82475dd04cdd20959f68d5fc7f31e"
+    },
+    {
+      "path": "core/Echo.Core/Writes/ScanPlaylistRelinker.cs",
+      "sha256": "4853be3f6ced6e2c46f393cde749fc021c2b49f2ff8ebd4808e7fe2c2e3405e4"
+    },
+    {
+      "path": "core/Echo.Core/Writes/ScanRepairWriter.cs",
+      "sha256": "867e1fbcb01aa7e42657f128e95d26367d690162996d8fc2008a669d26e14b0f"
+    },
+    {
+      "path": "core/Echo.Core/Writes/ScanSnapshotWriter.cs",
+      "sha256": "5fb5bdb7228404f4e4749929fac5dacdbd8eb5c14058f864069633ddd423638a"
+    },
+    {
+      "path": "core/Echo.Core/Writes/ScanTrackWriter.cs",
+      "sha256": "f8d6ddb6df08e61e1d08569a8b4c2e0e1069257eeab3a141aa02d68e8facc5b7"
+    },
+    {
+      "path": "core/Echo.Core/Writes/ScanWriteGuard.cs",
+      "sha256": "6b96e2eb56c1cf04fcf79615e8de6de9ce14c20f62cfed9efe0ad1cc1dd3a744"
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "e0eedba615d5cd1b986afb6c5b3a4b1ae33713e7e9dc74d19daec5e3221f9d2e"
+    },
+    {
+      "path": "core/Directory.Build.props",
+      "sha256": "b5a7d802ac5fbae473db0e7b48f0acd3118b12913c5e1076815508995b0ac54a"
+    },
+    {
+      "path": "core/global.json",
+      "sha256": "bfcc174241af2b0106ef5e22321e2312ce463dbdc5e1fe4ae1abde6b4bce6083"
+    },
+    {
+      "path": "scripts/generate-library-migrations.mjs",
+      "sha256": "46a39140197e621a5cdc6d4ea5cf3feb1b516f5e553c098b474a61d44b919e8a"
+    },
+    {
+      "path": "scripts/library-migrations/compile-migrations.mjs",
+      "sha256": "7e30b4a864ee6094dcc8623869ad1abe904cc651ff5d125dd1254fe5e14f76eb"
+    },
+    {
+      "path": "scripts/generate-core-search-data.mjs",
+      "sha256": "d6f457309506cf3b3c1b69ed56eaff8b40d9c3914219725e4bf3d6f8cb25430c"
+    },
+    {
+      "path": "src/shared/library/librarySchemaContract.ts",
+      "sha256": "7ae534a7f334029a14f2dbc1eae2bc115a18c35446e92e36e4f971d01e5fb140"
+    },
+    {
+      "path": "src/main/database/migrations.ts",
+      "sha256": "099701983c7e3aedb67255635cb50d8ecb71a28c64b3dd7013de5bca941fd218"
+    },
+    {
+      "path": "src/main/database/personalLibrarySchema.ts",
+      "sha256": "8839c51618c1601cf27e75482247cb556767d5259ef8c7ad20e4b414dabd0571"
+    },
+    {
+      "path": "src/main/database/listenerCustomizationSchema.ts",
+      "sha256": "b7be01075ee06e363330dcaac0ae39b94c29080122a1150f7ba6b4d3c302b083"
+    },
+    {
+      "path": "src/main/database/albumCandidateIndexSchema.ts",
+      "sha256": "9562132336d5b56151cae95af35962b13d7104b5f246992d2b47d18db4b6563d"
+    },
+    {
+      "path": "src/main/database/lyricsVideoBindingSchema.ts",
+      "sha256": "9ca421e03711d904df4328fd1c6cf61df3b0479112cbf7831e476d8d40d351e0"
+    },
+    {
+      "path": "src/main/database/playlistManagementSchema.ts",
+      "sha256": "e3b257c44051cf0f36483e1924dafa28bdb819853f42783a87ab502910cb227d"
+    },
+    {
+      "path": "src/main/database/savedSegmentsSchema.ts",
+      "sha256": "6db01afb9a954712cec4278c56835135bc29055a934f69bd425f97948340ef1e"
+    },
+    {
+      "path": "src/main/database/playlistGroupsSchema.ts",
+      "sha256": "17ff9de7d8717c7049c7e1434b62b3f530677465fcc13460d2dd5f14d0d5cc94"
+    },
+    {
+      "path": "src/main/database/albumCurationSchema.ts",
+      "sha256": "617187f8e806ff0dd0a3b313b71c275abde9f0ebaa8df6971a8fe4e3d4fc58a5"
+    },
+    {
+      "path": "src/main/database/artistCreditRuleSchema.ts",
+      "sha256": "202ba83d56ca175344cfa573a2cd6e321c9f024e63d01f476ee62dee464e11e4"
+    },
+    {
+      "path": "src/main/database/vocalDetectionSchema.ts",
+      "sha256": "2e44a60fcbd159a71bca794a0fdb627f1f69e5eae05d13fb2355ded6b393279e"
+    },
+    {
+      "path": "src/main/database/audioAnalysisIdentitySchema.ts",
+      "sha256": "0caeb0ee210f322eaffccd12faa68b1e1e55816301dadcb3aea1d62f6103bead"
+    },
+    {
+      "path": "src/main/database/replayGainMeasurementSchema.ts",
+      "sha256": "e2b4807f925ae55d52ad9c1b00631120ccee0b482bf8bcaa835f67424675f763"
+    },
+    {
+      "path": "src/main/database/playlistSortKeySchema.ts",
+      "sha256": "2d96f1d97988d964d48f67c48e13763584a49d05a8121ee9992e49cf2cc6f66a"
+    },
+    {
+      "path": "src/main/database/coreCommandJournalSchema.ts",
+      "sha256": "72c5d705c46fdccc7cc7ac3b3d2e4438a26cccde0c2f18b243becabfed93847d"
+    },
+    {
+      "path": "src/main/database/coreMutationStreamsSchema.ts",
+      "sha256": "6791c0c497f6d743f2edfd093ea9169e80530c61c063f73df436d5b3d8efc47b"
+    },
+    {
+      "path": "src/main/database/coreScanSeenPathsSchema.ts",
+      "sha256": "0bf72377c2b32ef8108670b629ef9d1a9050157a291969ce18bc40788dde9d60"
+    },
+    {
+      "path": "src/main/database/coreScanExecutionSchema.ts",
+      "sha256": "8ff55ec6d44a8cd651d950353c5bef3af6f5c3c49a5da4eb87b76c3c484385ac"
+    },
+    {
+      "path": "src/main/database/coreScanDispatchSchema.ts",
+      "sha256": "e948ee1b2ec81b5e361a0eb6a74cac583299efb53f889f6a481aaf47298291cf"
+    },
+    {
+      "path": "src/main/database/scanPathLookupSchema.ts",
+      "sha256": "243b618d862e04254670000e6cb1838a9380817d47593f7fdfd9e82e259ae682"
+    },
+    {
+      "path": "src/main/database/trackSearchFtsSchema.ts",
+      "sha256": "6a0e5cf867981091a2b0c96c664ed7570e8d6689ae6c50069611610a38adde1e"
+    },
+    {
+      "path": "src/main/database/schema.ts",
+      "sha256": "246ab2d3255dbd8d485c060878e61260655c5ec843b5623819d0f40ebb32b512"
+    }
+  ],
+  "modifications": [
+    "Standalone Core embeds an unchanged migration catalog instead of invoking the ECHO Node build target. Canonical SQL/compiler sources retained.",
+    "Generic Windows application icon; original icon asset omitted.",
+    "Standalone version and deterministic build settings."
+  ],
+  "excluded": [
+    "Steam/Electron/audio hosts",
+    "user libraries/settings/media",
+    "credentials and machine paths",
+    "original Git history",
+    "development binary outputs"
+  ]
+}

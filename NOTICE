@@ -1,0 +1,8 @@
+ECHO Bridge
+Copyright (c) 2026 Moekotori and ECHO contributors.
+Application source: GNU AGPL version 3 only (AGPL-3.0-only).
+Initial source derived from https://github.com/Moekotori/ECHOSteam.
+See SOURCE_PROVENANCE.json for the exact upstream revision and modifications.
+
+Separately licensed dependencies and search data retain their own licenses.
+No Steam SDK, Electron, audio host, original user library or media is included.
