@@ -105,7 +105,13 @@ public sealed class BridgeHttpServer(BridgeLibraryReader reader, string deviceId
             return new { device = Device, catalog = catalog.Page(Read("kind") is "" ? "songs" : Read("kind"), number, Read("q"),
                 sort.Length == 0 ? null : sort, parentKind.Length == 0 ? null : parentKind, Read("parentId"), cancellation) };
         }
-        if (path == "/echo-link/peer/v1/thumb") return new { device = Device, image = BridgeArtwork.Read(reader.Profile, Read("id"), cancellation) };
+        if (path == "/echo-link/peer/v1/thumb")
+        {
+            var size = Read("size");
+            if (!int.TryParse(size.Length == 0 ? "160" : size, out var pixels) || pixels <= 0)
+                throw new BridgeException(400, "invalid_peer_asset");
+            return new { device = Device, image = BridgeArtwork.Read(reader.Profile, Read("id"), cancellation, pixels) };
+        }
         if (path == "/echo-link/peer/v1/lyrics") return new { device = Device, lyrics = BridgeLyrics.Read(reader, Read("id"), cancellation) };
         if (path == "/echo-link/peer/v1/stream")
         {

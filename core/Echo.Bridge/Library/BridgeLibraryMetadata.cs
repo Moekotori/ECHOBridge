@@ -23,34 +23,21 @@ public static class BridgeLibraryMetadata
         return command.ExecuteScalar() as string;
     });
 
-    public static (List<Dictionary<string, object?>> Entries, long Total) Folders(BridgeProfile profile, string search, int page, CancellationToken cancellation)
-        => Read(profile, cancellation, database =>
-        {
-            using var command = database.RequireConnection().CreateCommand();
-            command.CommandText = "SELECT id,name FROM folders WHERE enabled=1 AND status!='removed' ORDER BY created_at,id";
-            using var rows = command.ExecuteReader();
-            var entries = new List<Dictionary<string, object?>>(50);
-            long total = 0;
-            while (rows.Read())
-            {
-                if (!rows.GetString(1).Contains(search.Trim(), StringComparison.OrdinalIgnoreCase)) continue;
-                if (total >= (page - 1L) * 50 && entries.Count < 50)
-                    entries.Add(BridgeTrackProjection.Container("folder", "root:" + rows.GetString(0), rows.GetString(1), "", 0, null));
-                total++;
-            }
-            return (entries, total);
-        });
-
-    public static string? Cover(BridgeProfile profile, string id, CancellationToken cancellation) => Read(profile, cancellation, database =>
+    public static string? Cover(BridgeProfile profile, string id, CancellationToken cancellation, int size = 160) => Read(profile, cancellation, database =>
     {
         using var command = database.RequireConnection().CreateCommand();
-        command.CommandText = "SELECT COALESCE(thumb_path,cover_thumb,album_path) FROM covers WHERE id=$id LIMIT 1";
+        command.CommandText = "SELECT COALESCE(thumb_path,cover_thumb),album_path,COALESCE(large_path,cover_large) FROM covers WHERE id=$id LIMIT 1";
         command.Parameters.AddWithValue("$id", id);
-        var path = command.ExecuteScalar() as string;
-        if (string.IsNullOrWhiteSpace(path)) return null;
-        var full = Path.GetFullPath(path, profile.CoverDirectory);
+        using var row = command.ExecuteReader();
+        if (!row.Read()) return null;
         var root = Path.TrimEndingDirectorySeparator(Path.GetFullPath(profile.CoverDirectory)) + Path.DirectorySeparatorChar;
-        return full.StartsWith(root, OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)
-            && File.Exists(full) ? full : null;
+        foreach (var column in size > 320 ? new[] { 2, 1, 0 } : new[] { 1, 0, 2 })
+        {
+            if (row.IsDBNull(column) || string.IsNullOrWhiteSpace(row.GetString(column))) continue;
+            var full = Path.GetFullPath(row.GetString(column), profile.CoverDirectory);
+            if (full.StartsWith(root, OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)
+                && File.Exists(full)) return full;
+        }
+        return null;
     });
 }

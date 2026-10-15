@@ -41,15 +41,21 @@ public static class BridgeLyrics
             if (!File.Exists(path) || new FileInfo(path).Length > 200_000) return null;
             var text = File.ReadAllText(path);
             var lines = new List<object>();
-            foreach (var line in text.Split('\n').Take(2000))
+            var plain = new List<object>();
+            using var source = new StringReader(text);
+            for (var count = 0; count < 2000 && source.ReadLine() is { } line; count++)
             {
                 var match = Regex.Match(line, @"^\[(\d{1,3}):(\d{2})(?:\.(\d{1,3}))?\](.*)$", RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(20));
-                if (!match.Success) continue;
+                if (!match.Success)
+                {
+                    if (!string.IsNullOrWhiteSpace(line)) plain.Add(new { timeMs = -1, text = BridgeTrackProjection.Text(line.Trim()) });
+                    continue;
+                }
                 var ms = (int.Parse(match.Groups[1].Value) * 60 + int.Parse(match.Groups[2].Value)) * 1000;
                 if (match.Groups[3].Success) ms += int.Parse(match.Groups[3].Value.PadRight(3, '0'));
                 lines.Add(new { timeMs = ms, endMs = (int?)null, text = BridgeTrackProjection.Text(match.Groups[4].Value.TrimEnd()) });
             }
-            cached = new() { ["kind"] = lines.Count > 0 ? "synced" : "plain", ["lines"] = lines,
+            cached = new() { ["kind"] = lines.Count > 0 ? "synced" : "plain", ["lines"] = lines.Count > 0 ? lines : plain,
                 ["plainText"] = lines.Count == 0 ? text : null, ["syncedText"] = lines.Count > 0 ? text : null, ["offsetMs"] = 0 };
         }
         cached.Remove("removed");

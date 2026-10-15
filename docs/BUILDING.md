@@ -43,15 +43,15 @@ The packaging script requires PowerShell 7; end users only need to run the inclu
 
 ```powershell
 $env:ECHO_WINDOWS_PUBLISHER_NAME = 'Your verified publisher'
-./scripts/package-windows.ps1 -Directory misc/win-x64 -Version 26.10.15 -OutputDirectory misc/release
+./scripts/package-windows.ps1 -Directory misc/win-x64 -Version 26.10.15.1 -OutputDirectory misc/release
 ```
 
 This command verifies and packages already signed files; it does not acquire a certificate or bypass signing. The archive is portable; an installer can be added in a later release.
 
-For the explicitly authorized 26.10.15 **unsigned test** distribution, add `-UnsignedTest` and place `UNSIGNED-TEST-BUILD.txt` in the prepared directory. This mode keeps all completeness, license, private-data, clean-source and hash checks, but records that signature verification was deliberately skipped. Its archive filename includes `-unsigned-test`, and the public release must remain labeled as a test preview.
+For the explicitly authorized 26.10.15.1 **unsigned test** distribution, add `-UnsignedTest` and place `UNSIGNED-TEST-BUILD.txt` in the prepared directory. This mode keeps all completeness, license, private-data, clean-source and hash checks, but records that signature verification was deliberately skipped. Its archive filename includes `-unsigned-test`, and the public release must remain labeled as a test preview.
 
 ```powershell
-./scripts/package-windows.ps1 -Directory misc/prepared-bundle -Version 26.10.15 -OutputDirectory misc/release -UnsignedTest -ApplicationSourceCommit 5ac2f9e1381a7f5b454899a4c1e1d64037f3d239
+./scripts/package-windows.ps1 -Directory misc/prepared-bundle -Version 26.10.15.1 -OutputDirectory misc/release -UnsignedTest
 ```
 
 When only packaging/docs change, `ApplicationSourceCommit` may point to the unchanged application tag; the script verifies that `core` matches it and records the packaging commit separately. Do not move the existing source tag or substitute a binary compiled from different application code.

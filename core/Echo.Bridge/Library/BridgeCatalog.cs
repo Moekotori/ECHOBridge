@@ -71,16 +71,9 @@ public sealed class BridgeCatalog(BridgeLibraryReader reader)
             (entries, total) = ConfigurationPage(rows, search, page, row => row.Name,
                 row => BridgeTrackProjection.Container("playlist", row.Id, row.Name, row.Description ?? "", row.ItemCount, row.CoverId));
         }
-        else if (kind == "folders" && parentKind == "folder")
-        {
-            var folder = folders.Resolve(Required(parentId));
-            parameters.FolderChildren = new() { FolderId = folder.FolderId, ParentPath = folder.Path };
-            var rows = (IEnumerable<LibraryFolderNodeDto>)reader.Read("getFolderChildren", parameters, cancellation)!;
-            (entries, total) = ConfigurationPage(rows, search, page, row => row.Name,
-                row => BridgeTrackProjection.Container("folder", folders.Remember(row), row.Name, "", row.TrackCount, null));
-        }
-        else if (kind == "folders" && parentKind is null)
-            (entries, total) = BridgeLibraryMetadata.Folders(reader.Profile, search, page, cancellation);
+        else if (kind == "folders" && parentKind is (null or "folder"))
+            (entries, total) = new BridgeFolderCatalog(reader, folders).Page(
+                parentKind is null ? null : Required(parentId), search, sort, page, cancellation);
         else throw new BridgeException(400, "invalid_peer_catalog_query");
 
         var response = new Dictionary<string, object?> { ["entries"] = entries, ["total"] = total, ["page"] = page, ["pageSize"] = 50, ["supportsSorting"] = true };

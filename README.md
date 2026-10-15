@@ -2,7 +2,7 @@
 
 独立、轻量的 Windows 曲库共享程序。直接读取 ECHO 已有曲库，通过同一局域网中的 ECHO Link 分享给电脑和手机，不需要启动 Steam 或 ECHO 主程序。
 
-**Windows x64 便携测试版：[下载完整 ZIP](https://github.com/Moekotori/ECHOBridge/releases/download/v26.10.15/ECHO-Bridge-26.10.15-win-x64-unsigned-test.zip)。此包未签名，Release 仍是预览版。**
+**Windows x64 便携测试版：[下载完整 ZIP](https://github.com/Moekotori/ECHOBridge/releases/download/v26.10.15.1/ECHO-Bridge-26.10.15.1-win-x64-unsigned-test.zip)。此包未签名，Release 仍是预览版。**
 
 [Releases](https://github.com/Moekotori/ECHOBridge/releases) · [ECHO](https://github.com/Moekotori/ECHOSteam) · [构建说明](docs/BUILDING.md) · [验证范围](docs/VALIDATION.md)
 
@@ -20,7 +20,7 @@
 
 ## 使用
 
-下载 `ECHO-Bridge-26.10.15-win-x64-unsigned-test.zip`，**完整解压**到固定目录，双击 `ECHO Bridge.exe`。不要直接在 ZIP 内运行，不要单独移动 EXE 或删除 DLL。无需安装 .NET，也无需启动 Steam。首次使用前先用兼容版本的 ECHO 建立并加载曲库；新版 ECHO 写入自动选择记录，旧版标准位置也会被检查，自定义位置可以手动选择。
+下载 `ECHO-Bridge-26.10.15.1-win-x64-unsigned-test.zip`，**完整解压**到固定目录，双击 `ECHO Bridge.exe`。不要直接在 ZIP 内运行，不要单独移动 EXE 或删除 DLL。无需安装 .NET，也无需启动 Steam。首次使用前先用兼容版本的 ECHO 建立并加载曲库；新版 ECHO 写入自动选择记录，旧版标准位置也会被检查，自定义位置可以手动选择。
 
 这是明确授权发布的**未签名测试版**。Windows 可能显示未知发布者提示，设备安全策略也可能阻止运行；不保证在开启 Smart App Control 等策略的设备上可用。请核对官方下载来源和校验值，不建议关闭系统安全保护。包内 `UNSIGNED-TEST-BUILD.txt`、运行时许可证和文件清单均会保留。
 

@@ -23,3 +23,9 @@ The project owner subsequently explicitly authorized an unsigned Windows x64 tes
 The portable archive includes complete .NET 10.0.12 runtime files and exact license/notice texts from resolved packages and pinned upstream sources. The immutable application source remains v26.10.15 / 5ac2f9e1381a7f5b454899a4c1e1d64037f3d239. Only packaging and documentation change; the archive manifest records the packaging revision separately.
 
 Final archive validation uses the extracted EXE, synthetic library/WAV and isolated settings, covers actual window startup, automatic sharing, catalog/Range access and the real stop-sharing button, and checks every extracted file against the manifest. Public Release notes report the actual outcome. This does not establish Smart App Control compatibility, physical Android playback, all audio formats or two-device firewall acceptance.
+
+## 26.10.15.1 revision
+
+This unsigned preview includes the requested-size artwork and lyric fixes and SQLite folder sorting before pagination. Android capability-driven actions and readable folder labels live in the Android client and require its updated build; they are not bundled into this Windows archive.
+
+Fresh standalone regression, publish and extracted-archive acceptance results are recorded in the 26.10.15.1 Release notes. The exact application source commit and every packaged file hash are recorded in release-manifest.json. The prior 26.10.15 release and its source tag remain unchanged. Mobile device/audio, two-device Wi-Fi and Smart App Control compatibility remain outside this local acceptance.

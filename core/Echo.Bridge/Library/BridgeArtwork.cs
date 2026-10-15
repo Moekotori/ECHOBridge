@@ -2,10 +2,12 @@ namespace Echo.Bridge.Library;
 
 public static class BridgeArtwork
 {
-    public static object? Read(BridgeProfile profile, string id, CancellationToken cancellation)
+    public static object? Read(BridgeProfile profile, string id, CancellationToken cancellation, int size = 160)
     {
         if (id.Length is 0 or > 2048) throw new BridgeException(400, "invalid_peer_asset");
-        var path = BridgeLibraryMetadata.Cover(profile, id, cancellation);
+        var path = BridgeLibraryMetadata.Cover(profile, id, cancellation, size);
+        if (path is not null && size > 320 && new FileInfo(path).Length > 256 * 1024)
+            path = BridgeLibraryMetadata.Cover(profile, id, cancellation);
         if (path is null) return null;
         using var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
         if (file.Length > 256 * 1024) throw new BridgeException(413, "peer_thumbnail_too_large");

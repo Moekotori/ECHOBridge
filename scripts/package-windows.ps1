@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory=$true)][string]$Directory,
-    [Parameter(Mandatory=$true)][ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version,
+    [Parameter(Mandatory=$true)][ValidatePattern('^\d+\.\d+\.\d+(?:\.\d+)?$')][string]$Version,
     [string]$OutputDirectory = 'misc/release',
     [switch]$UnsignedTest,
     [ValidatePattern('^[a-f0-9]{40}$')][string]$ApplicationSourceCommit

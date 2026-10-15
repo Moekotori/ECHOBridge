@@ -1,6 +1,6 @@
 {
   "project": "ECHO Bridge",
-  "version": "26.10.15",
+  "version": "26.10.15.1",
   "upstream": "https://github.com/Moekotori/ECHOSteam",
   "upstreamCommit": "c6ca10c6f7851094de871389a6a021067f113c22",
   "schemaDigest": "22cebc902f9c8dc6f1c5d2119ac6af58bcf60a89f26c082036d2b1e73e8f6618",
@@ -1217,5 +1217,49 @@
     "credentials and machine paths",
     "original Git history",
     "development binary outputs"
+  ],
+  "updates": [
+    {
+      "version": "26.10.15.1",
+      "upstreamCommit": "b2229d8c1f4285382b0ceb25f85eccccef520281",
+      "importedFiles": [
+        {
+          "path": "core/Echo.Bridge/Library/BridgeArtwork.cs",
+          "sha256": "27dfe801774349d0cd42c59178b034fa8a4ee75cab290af0aa769e45f23bae4b"
+        },
+        {
+          "path": "core/Echo.Bridge/Library/BridgeLibraryMetadata.cs",
+          "sha256": "7fc91e9ea0f754cc09e4f3e49144ae1492183788d0e43f50c3ed60f1c340ced9"
+        },
+        {
+          "path": "core/Echo.Bridge/Library/BridgeLyrics.cs",
+          "sha256": "62f357c48181213b6b758c15d720bbc40a44e678f5165889c8a30b615af6f351"
+        },
+        {
+          "path": "core/Echo.Bridge/Link/BridgeHttpServer.cs",
+          "sha256": "a53855fab2518ea8d79b37dca89705f11f82aa3e43c077de74ee52e6f8aa28fe"
+        },
+        {
+          "path": "core/Echo.Bridge/Library/BridgeCatalog.cs",
+          "sha256": "0f13c7c3116859ae1de2bd5f11f4cdce4f697d63f750c06f8312becae4d64bc8"
+        },
+        {
+          "path": "core/Echo.Bridge/Library/BridgeFolderCatalog.cs",
+          "sha256": "acf1e843fad82475d4138768d0a7bce22e737e45874923d2fbb469416bc27db9"
+        },
+        {
+          "path": "core/Echo.Bridge.Tests/BridgeAssetHttpTests.cs",
+          "sha256": "7840d6ab6b7a1ca4f2a75d33d69a783e9e65832b1e1b0c410d8c2b07b3a2501c"
+        },
+        {
+          "path": "core/Echo.Bridge.Tests/BridgeFolderCatalogTests.cs",
+          "sha256": "2211361655745c2d16db122e35b7497b9cee42eb5020a7aa153cf588797fe259"
+        }
+      ],
+      "changes": [
+        "Requested-size artwork and plain lyric lines.",
+        "Full-directory SQLite folder ordering before paging, bounded transient storage."
+      ]
+    }
   ]
 }
