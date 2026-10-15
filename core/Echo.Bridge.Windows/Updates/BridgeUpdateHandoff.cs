@@ -79,6 +79,9 @@ internal static class BridgeUpdateHandoff
         File.Delete(probe);
         var next = BridgeUpdateManifest.Validate(Path.Combine(stage, "package"),
             Version.Parse(File.ReadAllText(Path.Combine(stage, "version"))));
+        var executableVersion = FileVersionInfo.GetVersionInfo(Path.Combine(stage, "package", "ECHO Bridge.exe")).FileVersion;
+        if (!Version.TryParse(executableVersion, out var actualVersion) || BridgeReleaseClient.Normalize(actualVersion) != next.Version)
+            throw new InvalidDataException("Bridge package executable version mismatch.");
         var process = Process.GetCurrentProcess();
         var file = Path.Combine(stage, "job.json");
         Write(file, new() { Target = target, OldVersion = Current.ToString(), Version = next.Version.ToString(),

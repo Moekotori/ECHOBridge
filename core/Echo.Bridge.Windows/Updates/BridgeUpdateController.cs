@@ -103,7 +103,8 @@ internal sealed class BridgeUpdateController : IDisposable
             action.Text = "正在校验更新…";
             await Task.Run(() => BridgeUpdatePackage.Extract(archive, Path.Combine(stage, "package"), release), lifetime.Token);
             File.WriteAllText(Path.Combine(stage, "version"), release.Version.ToString());
-            var job = await Task.Run(() => BridgeUpdateHandoff.Prepare(stage, !form.Visible), lifetime.Token);
+            var startInTray = !form.Visible;
+            var job = await Task.Run(() => BridgeUpdateHandoff.Prepare(stage, startInTray), lifetime.Token);
             lifetime.Token.ThrowIfCancellationRequested();
             await exit(() => { BridgeUpdateHandoff.Launch(job); launched = true; });
         }

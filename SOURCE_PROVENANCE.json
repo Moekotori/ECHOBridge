@@ -1300,11 +1300,11 @@
         },
         {
           "path": "core/Echo.Bridge.Windows/Updates/BridgeUpdateController.cs",
-          "sha256": "d73f0e6c81743462bac1d55ac0c3da697d4a2cb9b338ebadc3f798e5ded655e9"
+          "sha256": "ded34ce9f816207e69146118470b42b9470fbbc786cd95e2c9ed42767daf5ce1"
         },
         {
           "path": "core/Echo.Bridge.Windows/Updates/BridgeUpdateHandoff.cs",
-          "sha256": "f2b1a43647c671ee46bbe500d3b9538553029ddefb142a44ade522acb69a06b8"
+          "sha256": "84f9140211327b2a18c1812af4b01dc91f1eda702b8b9a59f42372d34d00613a"
         },
         {
           "path": "core/Echo.Bridge.Windows/Updates/BridgeUpdateInstaller.cs",
