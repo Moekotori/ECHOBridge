@@ -5,6 +5,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\Echo.Bridge.Windows\BridgeSettings.cs" Link="Windows\BridgeSettings.cs" />
+    <Compile Include="..\Echo.Bridge.Windows\Updates\BridgeReleaseClient.cs" Link="Windows\BridgeReleaseClient.cs" />
+    <Compile Include="..\Echo.Bridge.Windows\Updates\BridgeUpdateManifest.cs" Link="Windows\BridgeUpdateManifest.cs" />
+    <Compile Include="..\Echo.Bridge.Windows\Updates\BridgeUpdatePackage.cs" Link="Windows\BridgeUpdatePackage.cs" />
+    <Compile Include="..\Echo.Bridge.Windows\Updates\BridgeUpdateInstaller.cs" Link="Windows\BridgeUpdateInstaller.cs" />
     <ProjectReference Include="..\Echo.Bridge\Echo.Bridge.csproj" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="xunit" Version="2.9.3" />

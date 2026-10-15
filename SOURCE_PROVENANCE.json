@@ -1,6 +1,6 @@
 {
   "project": "ECHO Bridge",
-  "version": "26.10.15.1",
+  "version": "26.10.15.2",
   "upstream": "https://github.com/Moekotori/ECHOSteam",
   "upstreamCommit": "c6ca10c6f7851094de871389a6a021067f113c22",
   "schemaDigest": "22cebc902f9c8dc6f1c5d2119ac6af58bcf60a89f26c082036d2b1e73e8f6618",
@@ -1259,6 +1259,74 @@
       "changes": [
         "Requested-size artwork and plain lyric lines.",
         "Full-directory SQLite folder ordering before paging, bounded transient storage."
+      ]
+    },
+    {
+      "version": "26.10.15.2",
+      "upstreamBaseCommit": "b2229d8c1f4285382b0ceb25f85eccccef520281",
+      "workingTreeImport": true,
+      "importedFiles": [
+        {
+          "path": "core/Echo.Bridge.Windows/Program.cs",
+          "sha256": "e66172df1d494ed208f07b10f0eb4cb64f54e8bc55d33d56015d0438493ae436"
+        },
+        {
+          "path": "core/Echo.Bridge.Windows/BridgeForm.cs",
+          "sha256": "1008642f894d2885c64225ce58b59bdd93ea93a345fa0e0a138142f33eb1dc3b"
+        },
+        {
+          "path": "core/Echo.Bridge.Windows/BridgeView.cs",
+          "sha256": "f68538ae5b5279f860f84a63d576cfb672d88f28b5f13126e53e694f494601f4"
+        },
+        {
+          "path": "core/Echo.Bridge.Windows/BridgeSettings.cs",
+          "sha256": "c2d52de8f416241a8ae4202b70f8db5bf83aeb4bf93f1a43697a2a8aa1f5385d"
+        },
+        {
+          "path": "core/Echo.Bridge.Windows/Echo.Bridge.Windows.csproj",
+          "sha256": "b5977e303653ac589c5fff11e0ea1fbbedf62a639f008cb74cb251c0887b5283"
+        },
+        {
+          "path": "core/Echo.Bridge.Tests/Echo.Bridge.Tests.csproj",
+          "sha256": "5439fcaac0c44fe60a7110cfff954823304cc23e68191bc9a353868ef03d82b8"
+        },
+        {
+          "path": "core/Echo.Bridge.Tests/BridgeUpdateTests.cs",
+          "sha256": "37446845d2606e17f162cb5fb8a03e3810bbd9bc853d31c99b4c9b19f4525d3d"
+        },
+        {
+          "path": "core/Echo.Bridge.Windows/Updates/BridgeReleaseClient.cs",
+          "sha256": "672a09e5a4365f49b17fe8705708b05e06cc387d67990a0fec112ede016d21c8"
+        },
+        {
+          "path": "core/Echo.Bridge.Windows/Updates/BridgeUpdateController.cs",
+          "sha256": "d73f0e6c81743462bac1d55ac0c3da697d4a2cb9b338ebadc3f798e5ded655e9"
+        },
+        {
+          "path": "core/Echo.Bridge.Windows/Updates/BridgeUpdateHandoff.cs",
+          "sha256": "f2b1a43647c671ee46bbe500d3b9538553029ddefb142a44ade522acb69a06b8"
+        },
+        {
+          "path": "core/Echo.Bridge.Windows/Updates/BridgeUpdateInstaller.cs",
+          "sha256": "f72eec97cabd282aa7742b04cc3e45a19054b4594e6b8781f8a0df7605580d14"
+        },
+        {
+          "path": "core/Echo.Bridge.Windows/Updates/BridgeUpdateManifest.cs",
+          "sha256": "9127e19a174726a79276ab2412c495f049c1c993c4a61f3116016b72dc3e9374"
+        },
+        {
+          "path": "core/Echo.Bridge.Windows/Updates/BridgeUpdatePackage.cs",
+          "sha256": "86fdec31028613a674ec5daec28df373dbe95b37d780069138acdcdfd56ab0c6"
+        },
+        {
+          "path": "core/Echo.Bridge.Windows/Updates/BridgeUpdateSmoke.cs",
+          "sha256": "5a73df17405b83ce771b1e3ad5d928581e232851c41deb6115ac0f382c398fd7"
+        }
+      ],
+      "changes": [
+        "Optional automatic public GitHub Release checks and user-confirmed portable updates.",
+        "Bounded download, archive/manifest integrity checks, managed-file replacement with rollback.",
+        "Signature state is not an update or packaging condition, per project owner instruction."
       ]
     }
   ]

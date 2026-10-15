@@ -5,6 +5,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>ECHO Bridge</AssemblyName>
     <RootNamespace>Echo.Bridge.Windows</RootNamespace>
+    <Version>26.10.15.2</Version>
     <ServerGarbageCollection>false</ServerGarbageCollection>
     <PublishTrimmed>false</PublishTrimmed>
   </PropertyGroup>

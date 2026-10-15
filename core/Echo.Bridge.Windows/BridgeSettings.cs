@@ -10,6 +10,7 @@ internal sealed class BridgeSettings
     public string DeviceId { get; set; } = "bridge-" + Guid.NewGuid().ToString("N");
     public string DeviceName { get; set; } = Environment.MachineName + " ECHO Bridge";
     public bool SharingEnabled { get; set; } = true;
+    public bool AutomaticUpdates { get; set; } = true;
     private static string FilePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ECHO Bridge", "bridge-settings.json");
 
     public static BridgeSettings Load() => LoadFile(FilePath);

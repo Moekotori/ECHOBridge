@@ -9,6 +9,8 @@ internal sealed class BridgeView : UserControl
     public Button Share { get; }
     public CheckBox StartAtLogin { get; } = new() { Text = "开机自启动", AutoSize = true,
         AccessibleName = "开机自启动", Margin = new Padding(0, 14, 0, 0) };
+    public CheckBox AutomaticUpdates { get; } = new() { Text = "自动检查更新", AutoSize = true,
+        AccessibleName = "自动检查更新", Margin = new Padding(16, 14, 0, 0) };
     private readonly Label libraryTitle, libraryDetail, state, detail;
     private readonly BridgeTheme theme;
     private readonly List<Font> fonts = [];
@@ -47,7 +49,10 @@ internal sealed class BridgeView : UserControl
         layout.Controls.Add(state, 0, statusRow); layout.Controls.Add(actions, 1, statusRow);
         detail = Label("同一局域网内，通过 ECHO Link 连接。", 8.5f, theme.Muted);
         detail.MaximumSize = new Size(400, 0); detail.Margin = new Padding(0, 6, 0, 0); AddWide(detail);
-        StartAtLogin.ForeColor = theme.Text; StartAtLogin.BackColor = theme.Background; AddWide(StartAtLogin);
+        StartAtLogin.ForeColor = AutomaticUpdates.ForeColor = theme.Text;
+        StartAtLogin.BackColor = AutomaticUpdates.BackColor = theme.Background;
+        var preferences = new FlowLayoutPanel { AutoSize = true, Dock = DockStyle.Top, Margin = Padding.Empty };
+        preferences.Controls.Add(StartAtLogin); preferences.Controls.Add(AutomaticUpdates); AddWide(preferences);
         var footer = Label("关闭窗口后继续在托盘运行", 8, theme.Muted);
         footer.Margin = new Padding(0, 16, 0, 0); AddWide(footer); Controls.Add(layout);
     }

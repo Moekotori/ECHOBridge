@@ -2,7 +2,7 @@
 
 独立、轻量的 Windows 曲库共享程序。直接读取 ECHO 已有曲库，通过同一局域网中的 ECHO Link 分享给电脑和手机，不需要启动 Steam 或 ECHO 主程序。
 
-**Windows x64 便携测试版：[下载完整 ZIP](https://github.com/Moekotori/ECHOBridge/releases/download/v26.10.15.1/ECHO-Bridge-26.10.15.1-win-x64-unsigned-test.zip)。此包未签名，Release 仍是预览版。**
+**Windows x64 便携版：[下载完整 ZIP](https://github.com/Moekotori/ECHOBridge/releases/download/v26.10.15.2/ECHO-Bridge-26.10.15.2-win-x64.zip)。Release 为预览版。**
 
 [Releases](https://github.com/Moekotori/ECHOBridge/releases) · [ECHO](https://github.com/Moekotori/ECHOSteam) · [构建说明](docs/BUILDING.md) · [验证范围](docs/VALIDATION.md)
 
@@ -14,15 +14,15 @@
 - 接收端播放原始媒体文件，支持 HTTP Range；Bridge 不转码、不缓存整曲。
 - 关闭窗口后在托盘继续运行；托盘菜单可以重新打开或退出。
 - 可选登录后自启动，默认关闭。
+- 自动检查 GitHub Release，支持托盘手动检查、一键下载校验并确认重启更新；可关闭自动检查。
 - 原生 Windows 小窗口，跟随系统浅色、深色和高对比度主题。
 
 第一阶段只提供已有曲库的只读共享。添加音乐、扫描入库、数据库升级和编辑仍由 ECHO 主程序负责。Bridge 不提供音频输出、电脑遥控、公网访问或云中继。
 
 ## 使用
 
-下载 `ECHO-Bridge-26.10.15.1-win-x64-unsigned-test.zip`，**完整解压**到固定目录，双击 `ECHO Bridge.exe`。不要直接在 ZIP 内运行，不要单独移动 EXE 或删除 DLL。无需安装 .NET，也无需启动 Steam。首次使用前先用兼容版本的 ECHO 建立并加载曲库；新版 ECHO 写入自动选择记录，旧版标准位置也会被检查，自定义位置可以手动选择。
+下载 `ECHO-Bridge-26.10.15.2-win-x64.zip`，**完整解压**到固定目录，双击 `ECHO Bridge.exe`。不要直接在 ZIP 内运行，不要单独移动 EXE 或删除 DLL。无需安装 .NET，也无需启动 Steam。首次使用前先用兼容版本的 ECHO 建立并加载曲库；新版 ECHO 写入自动选择记录，旧版标准位置也会被检查，自定义位置可以手动选择。
 
-这是明确授权发布的**未签名测试版**。Windows 可能显示未知发布者提示，设备安全策略也可能阻止运行；不保证在开启 Smart App Control 等策略的设备上可用。请核对官方下载来源和校验值，不建议关闭系统安全保护。包内 `UNSIGNED-TEST-BUILD.txt`、运行时许可证和文件清单均会保留。
 
 Bridge 开启共享后，接收设备需要处于同一可信局域网并启用 ECHO Link。桌面使用附近电脑/曲库入口；支持 Bridge 的 Android 客户端在连接页选择设备，再浏览曲库并在手机播放。旧版客户端不保证识别 Bridge。
 
@@ -43,7 +43,7 @@ dotnet test core/Echo.Bridge.Tests/Echo.Bridge.Tests.csproj -c Release
 
 ## 隐私和资源
 
-曲库和原媒体文件只读。广播包含设备名称、随机设备 ID、能力和端口，不包含曲库路径或歌曲标签；连接后客户端才能浏览共享内容。没有遥测、云上传、下载器或外部更新器。
+曲库和原媒体文件只读。广播包含设备名称、随机设备 ID、能力和端口，不包含曲库路径或歌曲标签；连接后客户端才能浏览共享内容。更新检查仅访问官方 GitHub Release API 和附件 CDN，发送固定程序标识及版本号，不上传曲库或用户内容。关闭“自动检查更新”可停止自动检查；托盘仍可手动检查。没有遥测或曲库云上传。
 
 适用于可信局域网，没有公网 TLS、账户认证或中继。不要向不可信网络共享私人曲库。查询分页、请求并发、媒体能力和流缓冲均有上限，不在内存保留整库或整曲。
 
@@ -53,4 +53,4 @@ Copyright © 2026 Moekotori and ECHO contributors. 应用源码采用 **AGPL-3.0
 
 此仓库包含 Bridge 以及它依赖的共享 Library Core、数据库契约和搜索数据。共享 Core 中的写入代码没有装配到 Bridge 的 HTTP 接口；Bridge 入口只允许只读查询。初始导出来源、文件哈希及独立构建调整见 [SOURCE_PROVENANCE.json](SOURCE_PROVENANCE.json)。
 
-ECHO Bridge is a standalone, native Windows library-sharing companion for ECHO. It uses an existing library read-only and advertises it through ECHO Link on a trusted LAN. The Windows x64 portable ZIP is an explicitly labeled **unsigned test build**: extract the whole archive and run `ECHO Bridge.exe`. Signed Windows binaries are pending. No Steam client, Electron runtime, scanner or audio renderer is required at runtime.
+ECHO Bridge is a standalone, native Windows library-sharing companion for ECHO. It uses an existing library read-only and advertises it through ECHO Link on a trusted LAN. The Windows x64 portable ZIP is complete and self-contained: extract the whole archive and run `ECHO Bridge.exe`.  No Steam client, Electron runtime, scanner or audio renderer is required at runtime.

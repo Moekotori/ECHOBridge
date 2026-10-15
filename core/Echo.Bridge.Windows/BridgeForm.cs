@@ -11,6 +11,7 @@ internal sealed class BridgeForm : Form
     private readonly Func<string?> discover;
     private readonly BridgeStartupRegistration startup;
     private readonly Action<BridgeSettings> persistSettings;
+    private Updates.BridgeUpdateController? updates;
     private readonly System.Windows.Forms.Timer networkStatus = new() { Interval = 2000 };
     private string? databasePath;
     private bool? displayedAutomatic;
@@ -35,6 +36,7 @@ internal sealed class BridgeForm : Form
         tray = new NotifyIcon { Icon = Icon, Text = "ECHO Bridge", ContextMenuStrip = menu, Visible = true };
         tray.DoubleClick += (_, _) => Restore();
         ResolveLibrary(); view.DeviceName.Text = settings.DeviceName;
+        view.AutomaticUpdates.Checked = settings.AutomaticUpdates;
         RefreshStartup(); view.StartAtLogin.CheckedChanged += (_, _) => ChangeStartup();
         view.Browse.Click += (_, _) => SelectLibrary();
         view.Automatic.Click += (_, _) => { settings.UseAutomaticLibrary = true; ResolveLibrary(); SaveSelection(); };
@@ -76,6 +78,19 @@ internal sealed class BridgeForm : Form
         // Create only the message handle. A form-less ApplicationContext never shows the window.
         _ = Handle;
         BeginInvoke((Action)(async () => await ApplyInitialSharing()));
+        updates?.Start();
+    }
+    internal void EnableUpdates() => updates = new(this, view.AutomaticUpdates, tray, settings, persistSettings, ExitForUpdate);
+    private async Task ExitForUpdate(Action launch)
+    {
+        if (busy || exiting) throw new InvalidOperationException("Bridge is changing sharing state.");
+        exiting = true; networkStatus.Stop(); view.Enable(false, runtime.Session is not null);
+        try { await runtime.Stop(); launch(); Close(); }
+        catch
+        {
+            exiting = false; view.Share.Text = runtime.Session is null ? "开启共享" : "停止共享";
+            view.Enable(true, runtime.Session is not null); UpdateStateTimer(); throw;
+        }
     }
     private void ResolveLibrary()
     {
@@ -184,7 +199,7 @@ internal sealed class BridgeForm : Form
     }
     protected override void Dispose(bool disposing)
     {
-        if (disposing) { networkStatus.Dispose(); tray.Visible = false; tray.ContextMenuStrip?.Dispose(); tray.Dispose(); }
+        if (disposing) { updates?.Dispose(); networkStatus.Dispose(); tray.Visible = false; tray.ContextMenuStrip?.Dispose(); tray.Dispose(); }
         base.Dispose(disposing);
     }
 }
