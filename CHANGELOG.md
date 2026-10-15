@@ -10,4 +10,6 @@
 
 Fresh standalone Windows publish and 13 Bridge regression tests passed. Synthetic native-window startup smoke passed. Existing desktop Link playback/withdrawal and Android JVM client protocol checks are recorded in docs/VALIDATION.md.
 
-This release contains **source only**. A signed Windows portable archive/installer is not provided because publisher/certificate configuration and final binary release checks are pending. Android physical-device NSD and audible playback acceptance are also pending. No scanning, audio renderer or Steam publishing is included.
+The existing source release is supplemented with a complete **unsigned Windows x64 portable test ZIP**, explicitly authorized on 2026-10-15. The filename, bundled warning and Release instructions identify the unsigned/test status. It includes .NET 10 runtime files and third-party notices; extract the whole folder and run `ECHO Bridge.exe`. The immutable original application source/tag is retained, and only packaging/docs change in the follow-up commit.
+
+Signed Windows distribution and Android physical-device NSD/audible playback acceptance remain pending. No scanning, audio renderer or Steam publishing is included.

@@ -14,4 +14,12 @@ Extraction retains product code and existing focused tests. The separate export 
 
 Fresh self-contained Windows publish passed in 12.3 seconds. All 13 focused Bridge tests passed with zero failures/skips in an 11.4-second command. Synthetic native-window startup passed in 3.4 seconds. Signing preflight failed because no Windows publisher/certificate was configured, so no binary archive was published. These checks took 27.2 seconds cumulatively, within the 120-second budget.
 
-No user media, databases, private settings, credentials, original repository history or development binary directories are included in the source release. Windows binary publication is blocked until certificate configuration, final PE signatures and exact runtime notices pass. This source release makes no signed-binary or Steam-release claim.
+No user media, databases, private settings, credentials, original repository history or development binary directories are included in the source release. These initial checks made no signed-binary or Steam-release claim.
+
+## Unsigned portable test distribution
+
+The project owner subsequently explicitly authorized an unsigned Windows x64 test ZIP in the existing Release. Signed packaging remains the default; the explicit unsigned test mode records skipped signature verification and requires a warning file, notices, clean corresponding source and final file hashes.
+
+The portable archive includes complete .NET 10.0.12 runtime files and exact license/notice texts from resolved packages and pinned upstream sources. The immutable application source remains v26.10.15 / 5ac2f9e1381a7f5b454899a4c1e1d64037f3d239. Only packaging and documentation change; the archive manifest records the packaging revision separately.
+
+Final archive validation uses the extracted EXE, synthetic library/WAV and isolated settings, covers actual window startup, automatic sharing, catalog/Range access and the real stop-sharing button, and checks every extracted file against the manifest. Public Release notes report the actual outcome. This does not establish Smart App Control compatibility, physical Android playback, all audio formats or two-device firewall acceptance.

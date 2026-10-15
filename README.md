@@ -2,7 +2,7 @@
 
 独立、轻量的 Windows 曲库共享程序。直接读取 ECHO 已有曲库，通过同一局域网中的 ECHO Link 分享给电脑和手机，不需要启动 Steam 或 ECHO 主程序。
 
-**当前 Release 提供完整源码。签名 Windows 下载包尚未发布；本地构建产物属于开发版本。**
+**Windows x64 便携测试版：[下载完整 ZIP](https://github.com/Moekotori/ECHOBridge/releases/download/v26.10.15/ECHO-Bridge-26.10.15-win-x64-unsigned-test.zip)。此包未签名，Release 仍是预览版。**
 
 [Releases](https://github.com/Moekotori/ECHOBridge/releases) · [ECHO](https://github.com/Moekotori/ECHOSteam) · [构建说明](docs/BUILDING.md) · [验证范围](docs/VALIDATION.md)
 
@@ -20,7 +20,9 @@
 
 ## 使用
 
-在已通过验收的 Windows 发行包提供后：下载并**完整解压**到固定目录，双击 `ECHO Bridge.exe`。无需安装 .NET。首次使用前先用兼容版本的 ECHO 建立并加载曲库；新版 ECHO 写入自动选择记录，旧版标准位置也会被检查，自定义位置可以手动选择。
+下载 `ECHO-Bridge-26.10.15-win-x64-unsigned-test.zip`，**完整解压**到固定目录，双击 `ECHO Bridge.exe`。不要直接在 ZIP 内运行，不要单独移动 EXE 或删除 DLL。无需安装 .NET，也无需启动 Steam。首次使用前先用兼容版本的 ECHO 建立并加载曲库；新版 ECHO 写入自动选择记录，旧版标准位置也会被检查，自定义位置可以手动选择。
+
+这是明确授权发布的**未签名测试版**。Windows 可能显示未知发布者提示，设备安全策略也可能阻止运行；不保证在开启 Smart App Control 等策略的设备上可用。请核对官方下载来源和校验值，不建议关闭系统安全保护。包内 `UNSIGNED-TEST-BUILD.txt`、运行时许可证和文件清单均会保留。
 
 Bridge 开启共享后，接收设备需要处于同一可信局域网并启用 ECHO Link。桌面使用附近电脑/曲库入口；支持 Bridge 的 Android 客户端在连接页选择设备，再浏览曲库并在手机播放。旧版客户端不保证识别 Bridge。
 
@@ -51,4 +53,4 @@ Copyright © 2026 Moekotori and ECHO contributors. 应用源码采用 **AGPL-3.0
 
 此仓库包含 Bridge 以及它依赖的共享 Library Core、数据库契约和搜索数据。共享 Core 中的写入代码没有装配到 Bridge 的 HTTP 接口；Bridge 入口只允许只读查询。初始导出来源、文件哈希及独立构建调整见 [SOURCE_PROVENANCE.json](SOURCE_PROVENANCE.json)。
 
-ECHO Bridge is a standalone, native Windows library-sharing companion for ECHO. It uses an existing library read-only and advertises it through ECHO Link on a trusted LAN. The initial public release is source-only; signed Windows binaries are pending. No Steam client, Electron runtime, scanner or audio renderer is required at runtime.
+ECHO Bridge is a standalone, native Windows library-sharing companion for ECHO. It uses an existing library read-only and advertises it through ECHO Link on a trusted LAN. The Windows x64 portable ZIP is an explicitly labeled **unsigned test build**: extract the whole archive and run `ECHO Bridge.exe`. Signed Windows binaries are pending. No Steam client, Electron runtime, scanner or audio renderer is required at runtime.
