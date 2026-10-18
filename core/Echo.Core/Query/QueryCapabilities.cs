@@ -7,6 +7,7 @@ public static class QueryCapabilities
     public const string GetAlbumForTrackLocal = "getAlbumForTrack.local";
     public const string GetSummary = "getSummary";
     public const string GetTracksLocalPage = "getTracks.localPage";
+    public const string GetTracksTitleJump = "getTracks.titleJump/v1";
     public const string GetAlbumsLocalNumeric = "getAlbums.localNumeric";
     public const string GetAlbumsLocalText = "getAlbums.localText";
     public const string GetAlbumsLocalSearch = "getAlbums.localSearch";
@@ -55,16 +56,26 @@ public static class QueryCapabilities
 
     public static readonly IReadOnlyList<string> HandshakeCapabilities =
     [
+        Echo.Core.Playlists.LastFmImportCommands.Capability,
         "playlists.management/v1",
+        Echo.Core.Playlists.PlaylistRelinkCommand.Capability,
         "playlists.organization/v1",
+        "playlists.insert-after/v1",
         "personalTags.commands/v1",
         LikedTrackIdsQuery.Capability,
         LikedTrackIdsQuery.AlbumCapability,
         "favorites.pages/v1",
         "playlistSortKeys.maintenance/v1",
+        "searchGlobalCatalog.local/v1",
+        "getArtistPageFacts.local/v1",
+        "getArtistInsights.local/v1",
+        "albumArtist.local/v1",
+        Echo.Core.Queues.PlaybackQueueStorage.Capability,
+        Echo.Core.Queues.PlaybackQueueStorage.AuthorityCapability,
         GetSummary,
         GetAlbumForTrackLocal,
         GetTracksLocalPage,
+        GetTracksTitleJump,
         GetTracksAlbumText,
         GetAlbumsLocalNumeric,
         GetAlbumsLocalText,
@@ -108,6 +119,7 @@ public static class QueryCapabilities
         GetPlaybackMemoryGraph,
         GetTracksFolderInsight,
         Sql.VocalPresenceSql.Capability,
+        Sql.LyricsFilterSql.Capability,
         GetTracksFolderScoped,
         GetFolderTracksPage,
         GetPlaylistItemsManualPage,
@@ -122,6 +134,7 @@ public static class QueryCapabilities
         return method switch
         {
             "getSummary" or "handshake" or "ping" or "shutdown" or "cancel" => true,
+            "searchGlobalCatalog" or "getArtistPageFacts" or "getArtistInsights" => true,
             "getFolderChildren" => true,
             "getLibraryQualityOverview" or "getLibraryQualityIssues" => true,
             "getLibraryInboxBatches" or "getLibraryInboxTracks" => true,
@@ -189,8 +202,7 @@ public static class QueryCapabilities
 
     public static bool SupportsArtists(CoreLibraryPageQuery? query, CoreNormalizedEntitySearch? search = null)
     {
-        if (!IsLocalOnly(query)
-            || query?.ArtistGrouping == "albumArtist"
+        if (!(query?.ArtistGrouping == "albumArtist" ? IsLocalOrOmitted(query) : IsLocalOnly(query))
             || query?.RandomWindow == true
             || HasUnsupportedSource(query?.SourceProvider)
             || (SearchContract.HasRawSearch(query) && search is null))
@@ -229,7 +241,7 @@ public static class QueryCapabilities
     public static bool SupportsArtistTracks(string? artistId, CoreLibraryPageQuery? query)
     {
         return !string.IsNullOrWhiteSpace(artistId)
-            && !artistId.StartsWith("album-artist:", StringComparison.Ordinal)
+            && (!artistId.StartsWith("album-artist:", StringComparison.Ordinal) || AlbumArtistQueries.LocalKey(artistId) is not null)
             && IsLocalOrOmitted(query)
             && query?.RandomWindow != true
             && !HasUnsupportedSource(query?.SourceProvider);

@@ -1,5 +1,7 @@
 using System.Net;
 using System.Text.Json;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
 using Echo.Bridge.Library;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -18,13 +20,15 @@ public sealed class BridgeHttpServer(BridgeLibraryReader reader, string deviceId
     private readonly BridgeCatalog catalog = new(reader);
     private readonly BridgeMediaTokens media = new();
     private readonly SemaphoreSlim requests = new(4, 4);
+    private readonly SemaphoreSlim mediaRequests = new(4, 4);
     private readonly SemaphoreSlim queries = new(1, 1);
     private readonly CancellationTokenSource lifetime = new();
     private WebApplication? application;
     public int Port { get; private set; }
     public string DeviceId { get; } = deviceId;
     public string Name { get; } = name;
-    public int ActiveRequests => 4 - requests.CurrentCount;
+    public int ActiveRequests => 8 - requests.CurrentCount - mediaRequests.CurrentCount;
+    private static readonly JsonSerializerOptions JsonOptions = new() { Encoder = JavaScriptEncoder.Create(UnicodeRanges.All) };
     public object Device => new { id = DeviceId, name = Name };
 
     public async Task StartAsync(int preferredPort = 0)
@@ -58,10 +62,12 @@ public sealed class BridgeHttpServer(BridgeLibraryReader reader, string deviceId
 
     private async Task Handle(HttpContext context)
     {
-        if (!requests.Wait(0)) { context.Response.StatusCode = 503; return; }
-        using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(context.RequestAborted, lifetime.Token);
         var path = context.Request.Path.Value ?? "";
-        cancellation.CancelAfter(path.StartsWith("/echo-link/media/", StringComparison.Ordinal) ? TimeSpan.FromHours(24) : TimeSpan.FromSeconds(8));
+        var mediaRequest = path.StartsWith("/echo-link/media/", StringComparison.Ordinal);
+        var admission = mediaRequest ? mediaRequests : requests;
+        if (!admission.Wait(0)) { context.Response.StatusCode = 503; return; }
+        using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(context.RequestAborted, lifetime.Token);
+        cancellation.CancelAfter(mediaRequest ? TimeSpan.FromHours(24) : TimeSpan.FromSeconds(8));
         try
         {
             context.Response.Headers.CacheControl = "no-store";
@@ -89,14 +95,14 @@ public sealed class BridgeHttpServer(BridgeLibraryReader reader, string deviceId
         catch (BridgeException error) { await Error(context, error.Status, error.Message); }
         catch (Echo.Core.Query.UnsupportedQueryException) { await Error(context, 422, "unsupported_peer_query"); }
         catch (Exception) { await Error(context, 503, "library_read_failed"); }
-        finally { requests.Release(); }
+        finally { admission.Release(); }
     }
 
     private object Query(HttpContext context, string path, IPAddress client, CancellationToken cancellation)
     {
         var query = context.Request.Query;
         string Read(string key) => query[key].ToString();
-        if (path == "/echo-link/peer/v1/device") return new { device = Device, version = 1, capabilities = new { library = true, playbackControl = false } };
+        if (path == "/echo-link/peer/v1/device") return new { device = Device, version = 1, capabilities = new { library = true, playbackControl = false, sourceRanges = true, scopedSearch = true } };
         if (path == "/echo-link/peer/v1/catalog")
         {
             var page = Read("page");
@@ -116,20 +122,23 @@ public sealed class BridgeHttpServer(BridgeLibraryReader reader, string deviceId
         if (path == "/echo-link/peer/v1/stream")
         {
             var track = reader.Track(Read("id"), cancellation);
-            var token = media.Issue(track, client);
+            var source = BridgeTrackSource.Resolve(track, cancellation);
+            if (source.Range is not null && Read("sourceRange") != "1") throw new BridgeException(415, "source_range_not_supported");
+            var token = media.Issue(track, source, client);
             var local = context.Connection.LocalIpAddress!.MapToIPv4();
-            return new { device = Device, track = new { id = track.Id, title = BridgeTrackProjection.Text(track.Title),
-                artist = BridgeTrackProjection.Text(track.Artist), album = BridgeTrackProjection.Text(track.Album),
-                durationMs = BridgeTrackProjection.Duration(track.Duration), canPlay = true,
-                streamUrl = $"http://{local}:{Port}/echo-link/media/{token}", artworkUrl = (string?)null,
-                audio = new { codec = track.Codec, sampleRateHz = track.SampleRate, bitDepth = track.BitDepth } } };
+            var preview = BridgeTrackProjection.Entry(track, source);
+            preview["streamUrl"] = $"http://{local}:{Port}/echo-link/media/{token}";
+            preview["artworkUrl"] = null;
+            preview["audio"] = new { codec = track.Codec, sampleRateHz = track.SampleRate, bitDepth = track.BitDepth };
+            if (source.Range is not null) preview["sourceRange"] = source.Range;
+            return new { device = Device, track = preview };
         }
         throw new BridgeException(404, "peer_endpoint_not_found");
     }
 
     private static async Task Json(HttpContext context, object value, CancellationToken cancellation)
     {
-        var bytes = JsonSerializer.SerializeToUtf8Bytes(value);
+        var bytes = JsonSerializer.SerializeToUtf8Bytes(value, JsonOptions);
         if (bytes.Length > 512 * 1024) throw new BridgeException(413, "peer_response_too_large");
         context.Response.ContentType = "application/json; charset=utf-8";
         context.Response.ContentLength = bytes.Length;

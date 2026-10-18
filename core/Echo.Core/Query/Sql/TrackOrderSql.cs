@@ -14,7 +14,7 @@ public static class TrackOrderSql
         sort_keys.track_id ASC
         """;
 
-    public static string ForSorts(IReadOnlyList<string> sorts, bool searchActive)
+    public static string ForSorts(IReadOnlyList<string> sorts, bool searchActive, bool indexedPlayback = false)
     {
         var active = sorts.Count > 0 ? sorts : ["default"];
         if (active[0] == "random")
@@ -30,7 +30,8 @@ public static class TrackOrderSql
 
         foreach (var sort in active)
         {
-            clauses.AddRange(ClausesFor(sort));
+            clauses.AddRange(ClausesFor(sort).Select(clause => indexedPlayback
+                ? clause.Replace("COALESCE(play_count, 0)", "play_count", StringComparison.Ordinal) : clause));
         }
 
         clauses.AddRange(StableClauses(active[0]));
@@ -51,7 +52,8 @@ public static class TrackOrderSql
         bool searchActive,
         string searchRankSql,
         string playCountSql,
-        string lastPlayedSql)
+        string lastPlayedSql,
+        bool useTextKeys = true)
     {
         var aliases = new HashSet<string>(StringComparer.Ordinal) { "id" };
         var order = ForSorts(sorts, searchActive);
@@ -79,20 +81,20 @@ public static class TrackOrderSql
             index++;
         }
 
-        return string.Join(",\n", aliases.Select(alias => Column(alias, searchRankSql, playCountSql, lastPlayedSql)));
+        return string.Join(",\n", aliases.Select(alias => Column(alias, searchRankSql, playCountSql, lastPlayedSql, useTextKeys)));
     }
 
-    private static string Column(string alias, string searchRankSql, string playCountSql, string lastPlayedSql) =>
+    private static string Column(string alias, string searchRankSql, string playCountSql, string lastPlayedSql, bool useTextKeys) =>
         alias switch
         {
             "id" => "tracks.id AS id",
             "search_rank" => $"{searchRankSql} AS search_rank",
-            "title_key" => "sort_keys.title_key AS title_key",
-            "title_text" => "sort_keys.title_text AS title_text",
-            "artist_key" => "sort_keys.artist_key AS artist_key",
-            "artist_text" => "sort_keys.artist_text AS artist_text",
-            "album_key" => "sort_keys.album_key AS album_key",
-            "album_text" => "sort_keys.album_text AS album_text",
+            "title_key" => useTextKeys ? "sort_keys.title_key AS title_key" : "tracks.title AS title_key",
+            "title_text" => useTextKeys ? "sort_keys.title_text AS title_text" : "tracks.title AS title_text",
+            "artist_key" => useTextKeys ? "sort_keys.artist_key AS artist_key" : "tracks.artist AS artist_key",
+            "artist_text" => useTextKeys ? "sort_keys.artist_text AS artist_text" : "tracks.artist AS artist_text",
+            "album_key" => useTextKeys ? "sort_keys.album_key AS album_key" : "tracks.album AS album_key",
+            "album_text" => useTextKeys ? "sort_keys.album_text AS album_text" : "tracks.album AS album_text",
             "disc_no" => "tracks.disc_no AS disc_no",
             "track_no" => "tracks.track_no AS track_no",
             "updated_at" => "tracks.updated_at AS updated_at",

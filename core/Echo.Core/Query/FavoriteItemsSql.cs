@@ -4,7 +4,7 @@ namespace Echo.Core.Query;
 
 internal static class FavoriteItemsSql
 {
-    public static string Order(string? sort) => sort switch
+    public static string Order(string? sort, bool useTextKeys = true) => sort switch
     {
         null or "" or "default" or "manual" => "ORDER BY playlist_items.position ASC, playlist_items.added_at ASC",
         "recent" or "addedDesc" => "ORDER BY playlist_items.added_at DESC, playlist_items.position ASC",
@@ -20,17 +20,17 @@ internal static class FavoriteItemsSql
               ELSE tracks.last_played_at END DESC,
               playlist_items.added_at DESC,playlist_items.position ASC
             """,
-        "qualityAsc" or "qualityDesc" => Quality(sort == "qualityAsc" ? "ASC" : "DESC"),
-        "audioSpecAsc" or "audioSpecDesc" => AudioSpec(sort == "audioSpecAsc" ? "ASC" : "DESC"),
-        _ => PlaylistSnapshotOrderSql.For(sort),
+        "qualityAsc" or "qualityDesc" => Quality(sort == "qualityAsc" ? "ASC" : "DESC", useTextKeys),
+        "audioSpecAsc" or "audioSpecDesc" => AudioSpec(sort == "audioSpecAsc" ? "ASC" : "DESC", useTextKeys),
+        _ => PlaylistSnapshotOrderSql.For(sort, useTextKeys),
     };
 
-    private static string Quality(string direction) => $"ORDER BY COALESCE(tracks.bitrate,0) {direction}, " +
-        $"COALESCE(tracks.size_bytes,0) {direction}, {PlaylistSnapshotOrderSql.Text("title")}, playlist_items.position ASC";
+    private static string Quality(string direction, bool useTextKeys) => $"ORDER BY COALESCE(tracks.bitrate,0) {direction}, " +
+        $"COALESCE(tracks.size_bytes,0) {direction}, {PlaylistSnapshotOrderSql.Text("title", useTextKeys: useTextKeys)}, playlist_items.position ASC";
 
-    private static string AudioSpec(string direction) => "ORDER BY (tracks.sample_rate IS NULL OR tracks.sample_rate<=0) ASC, " +
+    private static string AudioSpec(string direction, bool useTextKeys) => "ORDER BY (tracks.sample_rate IS NULL OR tracks.sample_rate<=0) ASC, " +
         $"tracks.sample_rate {direction}, (tracks.bit_depth IS NULL OR tracks.bit_depth<=0) ASC, " +
-        $"tracks.bit_depth {direction}, {PlaylistSnapshotOrderSql.Text("title")}, playlist_items.position ASC";
+        $"tracks.bit_depth {direction}, {PlaylistSnapshotOrderSql.Text("title", useTextKeys: useTextKeys)}, playlist_items.position ASC";
 
     public static string Where(bool albums, string? sourceProvider, List<object?> parameters)
     {

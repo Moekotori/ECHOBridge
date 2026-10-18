@@ -25,22 +25,25 @@ public static class GenreTrackPageQuery
             FROM tracks
             WHERE tracks.missing = 0 AND tracks.library_hidden = 0
               AND echo_genre_key(tracks.genre) = ?
-            """;
+            """ + ScopedTrackSearch.Predicate;
         var idSql = $"""
             SELECT tracks.id
             FROM tracks
             WHERE tracks.missing = 0 AND tracks.library_hidden = 0
               AND echo_genre_key(tracks.genre) = ?
+            {ScopedTrackSearch.Predicate}
             {orderSql}
             LIMIT ? OFFSET ?
             """;
 
         using var transaction = database.BeginDeferredRead();
-        var total = Convert.ToInt64(CachedQuery.Scalar(database, countSql, command => command.Add(normalizedKey)) ?? 0);
+        var total = Convert.ToInt64(CachedQuery.Scalar(database, countSql, command =>
+        { command.Add(normalizedKey); ScopedTrackSearch.Bind(command, query?.Search); }) ?? 0);
         var ids = new List<string>();
         using (var reader = CachedQuery.Reader(database, idSql, command =>
         {
             command.Add(normalizedKey);
+            ScopedTrackSearch.Bind(command, query?.Search);
             command.Add(page.PageSize);
             command.Add(page.Offset);
         }))

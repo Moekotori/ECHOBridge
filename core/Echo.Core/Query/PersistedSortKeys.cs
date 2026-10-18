@@ -6,6 +6,18 @@ namespace Echo.Core.Query;
 
 internal static class PersistedSortKeys
 {
+    // Standalone read-only clients cannot ask the desktop writer to refresh an index.
+    // Sorting source text in SQLite keeps their pages available without changing the library.
+    public static bool UseTextKeys(ReadOnlyLibraryDatabase database, bool fresh, bool allowUnindexed, string message)
+    {
+        if (fresh) return true;
+        if (!allowUnindexed) throw new UnsupportedQueryException(message);
+        using var command = database.RequireConnection().CreateCommand();
+        command.CommandText = "PRAGMA temp_store=FILE";
+        command.ExecuteNonQuery();
+        return false;
+    }
+
     public static bool AreFresh(
         ReadOnlyLibraryDatabase database,
         string revisionTable,

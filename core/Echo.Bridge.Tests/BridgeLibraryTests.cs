@@ -39,7 +39,7 @@ public sealed class BridgeLibraryTests
     }
 
     [Fact]
-    public void MediaCapabilitiesArePrivateRevocableAndDoNotSupportCueFragments()
+    public void MediaCapabilitiesArePrivateRevocableAndResolveCueFragmentsToPhysicalAudio()
     {
         using var fixture = new BridgeFixture();
         var track = new BridgeLibraryReader(BridgeProfile.Open(fixture.DatabasePath)).Track("kept");
@@ -49,7 +49,15 @@ public sealed class BridgeLibraryTests
         Assert.Equal(fixture.MediaPath, tokens.Resolve(token, first));
         Assert.Throws<BridgeException>(() => tokens.Resolve(token, other));
         tokens.Clear(); Assert.Throws<BridgeException>(() => tokens.Resolve(token, first));
-        track.Path += "#cueTrack=1"; Assert.False(BridgeTrackProjection.CanPlay(track));
+        var cuePath = Path.Combine(fixture.Root, "album.cue");
+        File.WriteAllText(cuePath, "FILE \"source.wav\" WAVE\n  TRACK 01 AUDIO\n    INDEX 01 00:00:00\n  TRACK 02 AUDIO\n    INDEX 01 00:01:00\n");
+        track.Path = cuePath + "#cueTrack=1";
+        Assert.True(BridgeTrackProjection.CanPlay(track));
+        var source = BridgeTrackSource.Resolve(track);
+        Assert.Equal(fixture.MediaPath, source.Path);
+        Assert.Equal(0, source.Range!.startSeconds);
+        Assert.Equal(1, source.Range.endSeconds);
+        Assert.Equal(fixture.MediaPath, tokens.Resolve(tokens.Issue(track, source, first), first));
     }
 
     [Fact]

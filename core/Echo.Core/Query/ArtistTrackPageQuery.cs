@@ -25,26 +25,28 @@ public static class ArtistTrackPageQuery
             throw new UnsupportedQueryException("getArtistTracks requires a local artists-table row.");
         }
 
-        const string countSql = """
+        var countSql = """
             SELECT COUNT(*) FROM artist_tracks
             INNER JOIN tracks ON tracks.id = artist_tracks.track_id
             WHERE artist_tracks.artist_id = ?
               AND tracks.missing = 0 AND tracks.library_hidden = 0
-            """;
+            """ + ScopedTrackSearch.Predicate;
         var idSql = $"""
             SELECT tracks.id FROM artist_tracks
             INNER JOIN tracks ON tracks.id = artist_tracks.track_id
             WHERE artist_tracks.artist_id = ?
               AND tracks.missing = 0 AND tracks.library_hidden = 0
+            {ScopedTrackSearch.Predicate}
             {OrderSql(page.Sorts[0])}
             LIMIT ? OFFSET ?
             """;
         var total = Convert.ToInt64(CachedQuery.Scalar(database, countSql, command =>
-            command.Add(artist.Id)) ?? 0);
+             { command.Add(artist.Id); ScopedTrackSearch.Bind(command, query?.Search); }) ?? 0);
         var ids = new List<string>();
         using (var reader = CachedQuery.Reader(database, idSql, command =>
         {
             command.Add(artist.Id);
+            ScopedTrackSearch.Bind(command, query?.Search);
             command.Add(page.PageSize);
             command.Add(page.Offset);
         }))

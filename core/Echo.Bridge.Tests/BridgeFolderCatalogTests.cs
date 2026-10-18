@@ -10,6 +10,26 @@ namespace Echo.Bridge.Tests;
 public sealed class BridgeFolderCatalogTests
 {
     [Fact]
+    public void EmojiRootAndParentPathsKeepChildNamesAndPlayableTrackScope()
+    {
+        using var fixture=new BridgeFixture();
+        var root=Path.Combine(fixture.Root,"Music🎵");
+        var media=Path.Combine(root,"Disc💿","Part🎶","track.wav");
+        Directory.CreateDirectory(Path.GetDirectoryName(media)!); File.Copy(fixture.MediaPath,media);
+        fixture.Execute("UPDATE folders SET path='"+root.Replace("'","''")+"' WHERE id='folder'; UPDATE tracks SET path='"+media.Replace("'","''")+"' WHERE id='kept';");
+        var hash=SHA256.HashData(File.ReadAllBytes(fixture.DatabasePath));
+        var catalog=new BridgeCatalog(new BridgeLibraryReader(BridgeProfile.Open(fixture.DatabasePath)));
+        var first=Read(catalog,1,"root:folder","titleAsc").GetProperty("entries")[0];
+        Assert.Equal("Disc💿",first.GetProperty("title").GetString());
+        var second=Read(catalog,1,first.GetProperty("id").GetString(),"titleAsc").GetProperty("entries")[0];
+        Assert.Equal("Part🎶",second.GetProperty("title").GetString());
+        var tracks=JsonSerializer.SerializeToElement(catalog.Page("songs",1,"",null,"folder",second.GetProperty("id").GetString(),default));
+        Assert.Equal(1,tracks.GetProperty("total").GetInt64());
+        Assert.True(tracks.GetProperty("entries")[0].GetProperty("canPlay").GetBoolean());
+        Assert.Equal(hash,SHA256.HashData(File.ReadAllBytes(fixture.DatabasePath)));
+    }
+
+    [Fact]
     public void EveryDirectorySortIsAppliedBeforePagingAndDoesNotExposePathsOrWriteLibrary()
     {
         using var fixture = new BridgeFixture();

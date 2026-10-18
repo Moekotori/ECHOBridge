@@ -13,6 +13,7 @@ internal sealed class BridgeUpdateJob
     public int HelperPid { get; set; }
     public long HelperStarted { get; set; }
     public bool StartInTray { get; set; }
+    public bool StartupConfirmed { get; set; }
     public string? Backup { get; set; }
 }
 
@@ -97,7 +98,7 @@ internal static class BridgeUpdateHandoff
         using var process = Process.Start(start) ?? throw new IOException("Bridge updater did not start.");
     }
 
-    public static void Apply(string file, string? diagnosticCache = null)
+    public static void Apply(string file, string? diagnosticCache = null, TimeSpan? startupTimeout = null)
     {
         try
         {
@@ -118,7 +119,13 @@ internal static class BridgeUpdateHandoff
                 restart.ArgumentList.Add("--updated-smoke"); restart.ArgumentList.Add(file); restart.ArgumentList.Add(diagnosticCache);
             }
             using var process = Process.Start(restart) ?? throw new IOException("Updated Bridge did not start.");
-            transaction.Commit();
+            try
+            {
+                BridgeUpdateStartup.Wait(process, file, Current, startupTimeout ?? TimeSpan.FromSeconds(20));
+                job.StartupConfirmed = true; Write(file, job);
+                transaction.Commit();
+            }
+            catch { BridgeUpdateStartup.Stop(process); throw; }
             if (diagnosticCache is not null)
                 File.WriteAllBytes(Path.Combine(diagnosticCache, "apply-result.json"), JsonSerializer.SerializeToUtf8Bytes(new
                     { ok = true, restartedPid = process.Id, version = Current.ToString(), backupRetained = Directory.Exists(transaction.Backup) }));
@@ -137,13 +144,29 @@ internal static class BridgeUpdateHandoff
         }
     }
 
-    public static bool Complete(string file, string? diagnosticCache = null)
+    private static BridgeUpdateJob RestartJob(string file, string? diagnosticCache)
     {
         var job = Read(file, diagnosticCache);
         if (Version.Parse(job.Version) != Current || !Path.GetFullPath(job.Target).Equals(AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase))
             throw new InvalidDataException("Bridge restart does not match its update.");
+        return job;
+    }
+
+    public static bool RestartInTray(string file)
+    {
+        var job = RestartJob(file, null);
+        BridgeUpdateManifest.Validate(job.Target, Current);
+        return job.StartInTray;
+    }
+
+    public static bool Complete(string file, string? diagnosticCache = null)
+    {
+        var job = RestartJob(file, diagnosticCache);
+        BridgeUpdateStartup.Confirm(file, Current);
         using (var helper = Find(job.HelperPid, job.HelperStarted))
-            if (helper is not null && !helper.WaitForExit(10000)) throw new IOException("Bridge updater is still running.");
+            if (helper is not null && !helper.WaitForExit(20000)) throw new IOException("Bridge updater is still running.");
+        job = Read(file, diagnosticCache);
+        if (!job.StartupConfirmed) throw new IOException("Bridge update was not committed.");
         BridgeUpdateManifest.Validate(job.Target, Current);
         if (job.Backup is not null) Directory.Delete(job.Backup, recursive: true);
         Directory.Delete(Path.GetDirectoryName(file)!, recursive: true);

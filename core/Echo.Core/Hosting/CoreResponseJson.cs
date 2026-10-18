@@ -16,6 +16,12 @@ internal static class CoreResponseJson
         writer.WritePropertyName("result");
         switch (result)
         {
+            case JsonElement value:
+                value.WriteTo(writer);
+                break;
+            case LastFmImportResult value:
+                JsonSerializer.Serialize(writer, value, CoreJsonContext.Default.LastFmImportResult);
+                break;
             case ScanCueBatchResult value:
                 JsonSerializer.Serialize(writer, value, CoreJsonContext.Default.ScanCueBatchResult);
                 break;
@@ -111,6 +117,15 @@ internal static class CoreResponseJson
                 break;
             case LibraryPageDto<LibraryAlbumDto> value:
                 JsonSerializer.Serialize(writer, value, CoreJsonContext.Default.LibraryPageDtoLibraryAlbumDto);
+                break;
+            case CatalogSourceDto value:
+                JsonSerializer.Serialize(writer, value, CoreJsonContext.Default.CatalogSourceDto);
+                break;
+            case ArtistFactsSourceDto value:
+                JsonSerializer.Serialize(writer, value, CoreJsonContext.Default.ArtistFactsSourceDto);
+                break;
+            case ArtistInsightsSourceDto value:
+                JsonSerializer.Serialize(writer, value, CoreJsonContext.Default.ArtistInsightsSourceDto);
                 break;
             case LibraryPageDto<LibraryArtistDto> value:
                 JsonSerializer.Serialize(writer, value, CoreJsonContext.Default.LibraryPageDtoLibraryArtistDto);

@@ -19,17 +19,18 @@ public static class AlbumTrackPageQuery
 
         var page = PageQueryNormalizer.Normalize(query);
         var list = QueryCapabilities.IsListProjection(query);
-        const string countSql = """
+        var countSql = """
             SELECT COUNT(*)
             FROM album_tracks
             INNER JOIN tracks ON tracks.id = album_tracks.track_id
             WHERE album_tracks.album_id = ? AND tracks.missing = 0 AND tracks.library_hidden = 0
-            """;
-        const string idSql = """
+            """ + ScopedTrackSearch.Predicate;
+        var idSql = $"""
             SELECT tracks.id, COALESCE(album_tracks.disc_no, tracks.disc_no) AS index_disc_no
             FROM album_tracks
             INNER JOIN tracks ON tracks.id = album_tracks.track_id
             WHERE album_tracks.album_id = ? AND tracks.missing = 0 AND tracks.library_hidden = 0
+            {ScopedTrackSearch.Predicate}
             ORDER BY
               COALESCE(album_tracks.disc_no, tracks.disc_no, 1),
               CASE WHEN COALESCE(album_tracks.track_no, tracks.track_no) IS NULL THEN 1 ELSE 0 END,
@@ -40,10 +41,11 @@ public static class AlbumTrackPageQuery
             """;
 
         using var transaction = database.BeginDeferredRead();
-        var total = Convert.ToInt64(CachedQuery.Scalar(database, countSql, command => command.Add(albumId)) ?? 0);
+        var total = Convert.ToInt64(CachedQuery.Scalar(database, countSql, command => { command.Add(albumId); ScopedTrackSearch.Bind(command, query?.Search); }) ?? 0);
         var ids = ReadIds(database, idSql, command =>
         {
             command.Add(albumId);
+            ScopedTrackSearch.Bind(command, query?.Search);
             command.Add(page.PageSize);
             command.Add(page.Offset);
         }, out var indexedDiscs);

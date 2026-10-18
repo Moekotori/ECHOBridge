@@ -23,10 +23,7 @@ public static class PlaylistListQuery
         "durationDesc",
     };
 
-    public static List<LibraryPlaylistDto> Execute(ReadOnlyLibraryDatabase database)
-    {
-        const string sql = """
-            SELECT
+    internal const string Columns = """
               id,
               name,
               description,
@@ -39,10 +36,12 @@ public static class PlaylistListQuery
               item_count,
               created_at,
               updated_at
-            FROM playlists
-            WHERE NOT (kind = 'system' AND source_provider = 'local' AND source_playlist_id IN ('liked-tracks', 'liked-albums'))
-            ORDER BY updated_at DESC, name COLLATE NOCASE
             """;
+    internal const string Visible = "NOT (kind = 'system' AND source_provider = 'local' AND source_playlist_id IN ('liked-tracks', 'liked-albums'))";
+
+    public static List<LibraryPlaylistDto> Execute(ReadOnlyLibraryDatabase database)
+    {
+        var sql = $"SELECT {Columns} FROM playlists WHERE {Visible} ORDER BY updated_at DESC, name COLLATE NOCASE";
 
         using var transaction = database.BeginDeferredRead();
         var items = new List<LibraryPlaylistDto>();
@@ -53,12 +52,17 @@ public static class PlaylistListQuery
         }
 
         reader.Close();
+        Enrich(database, items);
+        return items;
+    }
+
+    internal static void Enrich(ReadOnlyLibraryDatabase database, List<LibraryPlaylistDto> items)
+    {
         foreach (var item in items)
         {
             Echo.Core.SmartPlaylists.SmartPlaylistQueries.Enrich(database,item);
             PlaylistCoverQuery.Enrich(database,item);
         }
-        return items;
     }
 
 

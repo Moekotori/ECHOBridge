@@ -7,7 +7,11 @@ namespace Echo.Core.Protocol;
     PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
     GenerationMode = JsonSourceGenerationMode.Metadata)]
+[JsonSerializable(typeof(CatalogSourceDto))]
+[JsonSerializable(typeof(ArtistFactsSourceDto))]
+[JsonSerializable(typeof(ArtistInsightsSourceDto))]
 [JsonSerializable(typeof(CoreRequest))]
+[JsonSerializable(typeof(LastFmImportResult))]
 [JsonSerializable(typeof(NativeMetadataRequest))]
 [JsonSerializable(typeof(NativeMetadataResponse))]
 [JsonSerializable(typeof(ScanCueRequest))]

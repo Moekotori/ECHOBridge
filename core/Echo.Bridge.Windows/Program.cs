@@ -17,6 +17,8 @@ internal static class Program
         if (args is ["--sharing-smoke", var automaticLibrary, var automaticEvidence, var automaticAppData])
         { BridgeSharingSmoke.Run(automaticLibrary, automaticEvidence, automaticAppData); return; }
         if (args is ["--startup-smoke", var startupEvidence]) { BridgeStartupSmoke.Run(startupEvidence); return; }
+        if (args is ["--sharing-recovery-smoke", var recoveryLibrary, var recoveryEvidence, var recoveryMode])
+        { BridgeSharingRecoverySmoke.Run(recoveryLibrary, recoveryEvidence, recoveryMode); return; }
         if (args is ["--selection-smoke", var selectionAppData, var expectedDatabase, var selectionEvidence, var selectionMode])
         { BridgeLibrarySelectionSmoke.Run(selectionAppData, expectedDatabase, selectionEvidence, selectionMode); return; }
         if (args is ["--ui-smoke", var evidence]) { BridgeSmoke.Window(evidence); return; }
@@ -27,17 +29,29 @@ internal static class Program
         { BridgeSmoke.Discovery(fixtureLibrary, fixtureEvidence, fixtureAppData).GetAwaiter().GetResult(); return; }
         using var instance = new BridgeSingleInstance();
         var startInTray = args is ["--startup"];
+        string? restartJob = null;
         if (args is ["--updated", var completedJob])
         {
-            try { startInTray = Updates.BridgeUpdateHandoff.Complete(completedJob); }
+            try { startInTray = Updates.BridgeUpdateHandoff.RestartInTray(completedJob); restartJob = completedJob; }
             catch (Exception error) when (error is IOException or UnauthorizedAccessException or System.Text.Json.JsonException or FormatException)
-            { MessageBox.Show("更新已启动，临时文件未能清理。请保留原目录中的备份。", "ECHO Bridge", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            { Environment.ExitCode = 1; return; }
         }
         if (!instance.IsFirst) { if (!startInTray) instance.ActivateExisting(); return; }
         ApplicationConfiguration.Initialize();
         using var form = new BridgeForm(BridgeSettings.Load());
         form.EnableUpdates();
         _ = form.Handle; instance.Listen(form.Restore);
+        Task? updateCompletion = null;
+        if (restartJob is not null)
+            form.BeginInvoke((Action)(() =>
+            {
+                updateCompletion = Task.Run(() =>
+                {
+                    try { Updates.BridgeUpdateHandoff.Complete(restartJob); }
+                    catch (Exception error) when (error is IOException or UnauthorizedAccessException or System.Text.Json.JsonException or FormatException)
+                    { MessageBox.Show("更新已启动，临时文件未能清理。请保留原目录中的备份。", "ECHO Bridge", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+                });
+            }));
         if (startInTray)
         {
             using var context = new ApplicationContext();
@@ -45,5 +59,6 @@ internal static class Program
             form.StartInTray(); Application.Run(context);
         }
         else Application.Run(form);
+        updateCompletion?.GetAwaiter().GetResult();
     }
 }

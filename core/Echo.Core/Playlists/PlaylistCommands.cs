@@ -27,6 +27,7 @@ public static class PlaylistCommands
         var timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'");
         var result = request.Operation switch
         {
+            "cloud" => CloudPlaylistCommands.Execute(sql, request, timestamp),
             "manage" => PlaylistManagementCommands.Execute(sql, request.Management ?? throw new ArgumentException("Management request required."), timestamp, request.BackupDirectory),
             "inboxCreate" => InboxPlaylistCommand.Execute(sql, request, timestamp),
             "smartCreate" or "smartUpdate" or "smartFreeze" => Echo.Core.SmartPlaylists.SmartPlaylistCommands.Execute(sql, request, timestamp),
@@ -65,7 +66,7 @@ public static class PlaylistCommands
                 PlaylistBackupWriter.Write(sql, id!, "delete", request.BackupDirectory, timestamp);
                 sql.Run("DELETE FROM playlists WHERE id = $0", id);
                 break;
-            case "add": itemIds = PlaylistTrackCommands.Add(sql, id!, request.TrackIds ?? [], timestamp); break;
+            case "add": itemIds = PlaylistTrackCommands.Add(sql, id!, request.TrackIds ?? [], timestamp, request.AfterItemId); break;
             case "remove":
                 PlaylistBackupWriter.Write(sql, id!, "remove-item", request.BackupDirectory, timestamp);
                 sql.Run("DELETE FROM playlist_items WHERE id = $0", request.ItemId);

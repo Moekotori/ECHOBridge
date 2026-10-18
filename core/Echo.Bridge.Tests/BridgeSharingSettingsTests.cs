@@ -33,6 +33,7 @@ public sealed class BridgeSharingSettingsTests
     [Theory]
     [InlineData("{broken")]
     [InlineData("{\"SharingEnabled\":false,\"DeviceId\":\"invalid\"}")]
+    [InlineData("{\"SharingEnabled\":false,\"DeviceId\":null}")]
     public void DamagedExistingPreferenceDoesNotSilentlyResumeSharing(string json)
     {
         using var fixture = new BridgeFixture();

@@ -12,13 +12,17 @@ public sealed class BridgeMediaTokens
     private readonly object gate = new();
     public string Issue(LibraryTrackDto track, IPAddress client)
     {
-        if (!BridgeTrackProjection.CanPlay(track) || !File.Exists(track.Path)) throw new BridgeException(415, "unsupported_format");
+        return Issue(track, BridgeTrackSource.Resolve(track), client);
+    }
+    public string Issue(LibraryTrackDto track, BridgeTrackSource source, IPAddress client)
+    {
+        if (!File.Exists(source.Path)) throw new BridgeException(404, "peer_track_not_found");
         lock (gate)
         {
             Prune();
             if (tokens.Count >= 256) tokens.Remove(tokens.MinBy(pair => pair.Value.Expires).Key);
             var token = Convert.ToHexStringLower(RandomNumberGenerator.GetBytes(32));
-            tokens[token] = new(track.Path, client, DateTimeOffset.UtcNow.AddSeconds(Math.Clamp(track.Duration * 2 + 600, 1800, 86400)));
+            tokens[token] = new(source.Path, client, DateTimeOffset.UtcNow.AddSeconds(Math.Clamp(track.Duration * 2 + 600, 1800, 86400)));
             return token;
         }
     }

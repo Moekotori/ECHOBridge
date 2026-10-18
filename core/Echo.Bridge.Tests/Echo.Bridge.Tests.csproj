@@ -9,6 +9,7 @@
     <Compile Include="..\Echo.Bridge.Windows\Updates\BridgeUpdateManifest.cs" Link="Windows\BridgeUpdateManifest.cs" />
     <Compile Include="..\Echo.Bridge.Windows\Updates\BridgeUpdatePackage.cs" Link="Windows\BridgeUpdatePackage.cs" />
     <Compile Include="..\Echo.Bridge.Windows\Updates\BridgeUpdateInstaller.cs" Link="Windows\BridgeUpdateInstaller.cs" />
+    <Compile Include="..\Echo.Bridge.Windows\Updates\BridgeUpdateStartup.cs" Link="Windows\BridgeUpdateStartup.cs" />
     <ProjectReference Include="..\Echo.Bridge\Echo.Bridge.csproj" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="xunit" Version="2.9.3" />

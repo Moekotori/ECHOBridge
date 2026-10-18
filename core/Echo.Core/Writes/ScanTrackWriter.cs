@@ -84,7 +84,6 @@ INSERT INTO tracks (
           AND json_extract(tracks.field_sources_json, '$.bpm') IS NOT NULL
           THEN json_set(excluded.field_sources_json, '$.bpm', json_extract(tracks.field_sources_json, '$.bpm'))
           ELSE excluded.field_sources_json END,
-        missing = 0,
         updated_at = excluded.updated_at
         -- library_hidden stays at its stored value. A rescan must not unhide a track.
 """, id,
@@ -139,6 +138,8 @@ INSERT INTO tracks (
             0,
             created,
             Value(t,"updatedAt"));
+        // Leave visibility indexes untouched on the common present-track path.
+        if (existing is not null) sql.Run("UPDATE tracks SET missing=0 WHERE id=$0 AND missing!=0",id);
         if(t.TryGetProperty("audioAnalysisIdentity",out audio)) ScanIdentityWriter.Save(sql,id,audio);
         if(t.TryGetProperty("musicGraph",out var graph)) ScanMusicGraphWriter.Sync(sql,id,Text(t,"title") ?? "",graph,item.GraphFingerprint,timestamp);
         ScanPlaylistRelinker.Relink(sql,id,path,t,coverId,timestamp);

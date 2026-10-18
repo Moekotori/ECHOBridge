@@ -10,7 +10,8 @@ public static class AlbumPageQuery
     public static LibraryPageDto<LibraryAlbumDto> Execute(
         ReadOnlyLibraryDatabase database,
         CoreLibraryPageQuery? query,
-        CoreNormalizedEntitySearch? search = null)
+        CoreNormalizedEntitySearch? search = null,
+        bool allowUnindexedTextSort = false)
     {
         SearchContract.EnsureExecutableEntity(query, search);
         if (!QueryCapabilities.SupportsAlbums(query, search))
@@ -21,12 +22,11 @@ public static class AlbumPageQuery
         var page = PageQueryNormalizer.Normalize(query);
         var sort = QueryCapabilities.PrimarySort(query);
         var textSort = QueryCapabilities.IsAlbumTextSort(sort);
-        if (textSort && !PersistedSortKeys.AreAlbumKeysFresh(database))
-        {
-            throw new UnsupportedQueryException("local_album_sort_keys are stale; writer must sync before Core can order album pages.");
-        }
+        var useTextKeys = !textSort || PersistedSortKeys.UseTextKeys(database, PersistedSortKeys.AreAlbumKeysFresh(database),
+            allowUnindexedTextSort, "local_album_sort_keys are stale; writer must sync before Core can order album pages.");
 
         var playback = sort is "lastPlayed" or "playCountAsc" or "playCountDesc";
+        var trackSource = TrackQueryIndexes.EntityTrackSource(database);
         var osuSql = query?.ExcludeOsuAlbums == true
             ? """
               AND EXISTS (
@@ -40,19 +40,24 @@ public static class AlbumPageQuery
               )
               """
             : string.Empty;
-        var presentSql = """
-            EXISTS (
-              SELECT 1
-              FROM album_tracks
-              INNER JOIN tracks ON tracks.id = album_tracks.track_id
-              WHERE album_tracks.album_id = albums.id AND tracks.missing = 0 AND tracks.library_hidden = 0
-            )
-            """;
-        var sortJoin = textSort
+        var presentSql = VisibleAlbumSql.Predicate.Replace("INNER JOIN tracks", $"INNER JOIN {trackSource}", StringComparison.Ordinal);
+        var sortJoin = textSort && useTextKeys
             ? "INNER JOIN local_album_sort_keys AS sort_keys ON sort_keys.album_id = albums.id"
             : string.Empty;
-        var playbackCtes = playback
-            ? """
+        var indexedPlayback = playback && trackSource != "tracks" && TrackQueryIndexes.Ready(database, "playback")
+            && PersistedSortKeys.AreTrackKeysFresh(database);
+        var playbackCtes = indexedPlayback ? $"""
+              WITH local_album_playback_stats AS (
+                SELECT album_tracks.album_id, SUM(sort_keys.playback_sort_count) AS play_count,
+                       MAX(sort_keys.playback_sort_last) AS last_played_at
+                FROM album_tracks
+                INNER JOIN {trackSource} ON tracks.id = album_tracks.track_id
+                INNER JOIN local_track_sort_keys AS sort_keys ON sort_keys.track_id = tracks.id
+                WHERE tracks.missing = 0 AND tracks.library_hidden = 0
+                GROUP BY album_tracks.album_id
+              )
+              """ : playback
+            ? $"""
               WITH local_track_playback_stats AS (
                 SELECT track_id, SUM(completed_count) AS play_count, MAX(last_started_at) AS last_played_at
                 FROM playback_history_stats
@@ -61,10 +66,10 @@ public static class AlbumPageQuery
               ),
               local_album_playback_stats AS (
                 SELECT album_tracks.album_id,
-                       COALESCE(SUM(local_track_playback_stats.play_count), 0) AS play_count,
+                       COALESCE(SUM(MAX(COALESCE(tracks.play_count, 0), COALESCE(local_track_playback_stats.play_count, 0))), 0) AS play_count,
                        MAX(local_track_playback_stats.last_played_at) AS last_played_at
                 FROM album_tracks
-                INNER JOIN tracks ON tracks.id = album_tracks.track_id
+                INNER JOIN {trackSource} ON tracks.id = album_tracks.track_id
                 LEFT JOIN local_track_playback_stats ON local_track_playback_stats.track_id = album_tracks.track_id
                 WHERE tracks.missing = 0 AND tracks.library_hidden = 0
                 GROUP BY album_tracks.album_id
@@ -74,31 +79,24 @@ public static class AlbumPageQuery
         var playbackJoin = playback
             ? "LEFT JOIN local_album_playback_stats ON local_album_playback_stats.album_id = albums.id"
             : string.Empty;
-        var addedAt = """
+        var addedAt = $"""
             COALESCE((
               SELECT MAX(tracks.created_at)
               FROM album_tracks
-              INNER JOIN tracks ON tracks.id = album_tracks.track_id
+              INNER JOIN {trackSource} ON tracks.id = album_tracks.track_id
               WHERE album_tracks.album_id = albums.id AND tracks.missing = 0 AND tracks.library_hidden = 0
             ), albums.created_at)
             """;
-        var mtime = """
+        var mtime = $"""
             COALESCE((
               SELECT MAX(tracks.mtime_ms)
               FROM album_tracks
-              INNER JOIN tracks ON tracks.id = album_tracks.track_id
+              INNER JOIN {trackSource} ON tracks.id = album_tracks.track_id
               WHERE album_tracks.album_id = albums.id AND tracks.missing = 0 AND tracks.library_hidden = 0
             ), 0)
             """;
-        var orderSql = AlbumOrderSql(sort, addedAt, mtime);
-        var like = SqlFragments.LikeEntityFilter(
-            [
-                "albums.title",
-                "albums.album_artist",
-                "COALESCE(CAST(albums.year AS TEXT), '')",
-                SqlFragments.AlbumSearchBlobSql,
-            ],
-            search);
+        var orderSql = AlbumOrderSql(sort, addedAt, mtime, useTextKeys);
+        var like = AlbumSearchSql.Filter(search);
         var likeSql = string.IsNullOrEmpty(like.Sql) ? string.Empty : $"AND {like.Sql}";
         var focus = AlbumFocusSql.WhereSql(query?.AlbumFocus);
         var focusSql = string.IsNullOrEmpty(focus.Sql) ? string.Empty : $"AND {focus.Sql}";
@@ -116,8 +114,11 @@ public static class AlbumPageQuery
             {personalTagSql}
             """;
         var idPrefix = string.IsNullOrEmpty(playbackCtes) ? string.Empty : $"{playbackCtes} ";
+        // Search predicates can aggregate every album's track text. Count in the
+        // same pass rather than evaluating that exact predicate a second time.
+        var countWithPage = like.Sql.Length > 0 && page.TotalHint is null;
         var idSql = $"""
-            {idPrefix}SELECT albums.id
+            {idPrefix}SELECT albums.id{(countWithPage ? ", COUNT(*) OVER ()" : string.Empty)}
             FROM albums
             {sortJoin}
             {playbackJoin}
@@ -155,6 +156,7 @@ public static class AlbumPageQuery
         });
 
         var ids = new List<string>();
+        long? countedTotal = null;
         using (var reader = CachedQuery.Reader(database, idSql, command =>
         {
             BindSearch(command);
@@ -165,11 +167,12 @@ public static class AlbumPageQuery
             while (reader.Read())
             {
                 ids.Add(Convert.ToString(reader[0]) ?? string.Empty);
+                if (countWithPage) countedTotal = reader.GetInt64(1);
             }
         }
 
         var items = HydrateAlbums(database, ids);
-        var total = PageTotal.Resolve(
+        var total = countedTotal ?? PageTotal.Resolve(
             page,
             items.Count,
             () => Convert.ToInt64(CachedQuery.Scalar(database, countSql, BindSearch) ?? 0));
@@ -229,12 +232,12 @@ public static class AlbumPageQuery
         return items;
     }
 
-    private static string AlbumOrderSql(string sort, string addedAt, string mtime)
+    private static string AlbumOrderSql(string sort, string addedAt, string mtime, bool useTextKeys)
     {
-        const string titleAsc = "sort_keys.title_key COLLATE NOCASE ASC, sort_keys.title_text COLLATE NOCASE ASC";
-        const string titleDesc = "sort_keys.title_key COLLATE NOCASE DESC, sort_keys.title_text COLLATE NOCASE DESC";
-        const string artistAsc = "sort_keys.artist_key COLLATE NOCASE ASC, sort_keys.artist_text COLLATE NOCASE ASC";
-        const string artistDesc = "sort_keys.artist_key COLLATE NOCASE DESC, sort_keys.artist_text COLLATE NOCASE DESC";
+        var titleAsc = useTextKeys ? "sort_keys.title_key COLLATE NOCASE ASC, sort_keys.title_text COLLATE NOCASE ASC" : "albums.title COLLATE NOCASE ASC";
+        var titleDesc = useTextKeys ? "sort_keys.title_key COLLATE NOCASE DESC, sort_keys.title_text COLLATE NOCASE DESC" : "albums.title COLLATE NOCASE DESC";
+        var artistAsc = useTextKeys ? "sort_keys.artist_key COLLATE NOCASE ASC, sort_keys.artist_text COLLATE NOCASE ASC" : "albums.album_artist COLLATE NOCASE ASC";
+        var artistDesc = useTextKeys ? "sort_keys.artist_key COLLATE NOCASE DESC, sort_keys.artist_text COLLATE NOCASE DESC" : "albums.album_artist COLLATE NOCASE DESC";
         return sort switch
         {
             "recent" => $"ORDER BY {addedAt} DESC, albums.updated_at DESC, albums.id ASC",

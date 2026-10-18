@@ -11,7 +11,8 @@ public static class TrackPageQuery
     public static LibraryPageDto<LibraryTrackListRowDto> Execute(
         ReadOnlyLibraryDatabase database,
         CoreLibraryPageQuery? query,
-        CoreNormalizedTrackSearch? search)
+        CoreNormalizedTrackSearch? search,
+        bool allowUnindexedTextSort = false)
     {
         if (!QueryCapabilities.SupportsTracks(query, search))
         {
@@ -21,16 +22,21 @@ public static class TrackPageQuery
         SearchContract.EnsureExecutable(query, search);
 
         var page = PageQueryNormalizer.Normalize(query);
+        if (query?.TitleJumpLetter is not null)
+        {
+            return TrackTitleJumpQuery.Execute(database, query, page, search);
+        }
         var hasFts = !string.IsNullOrWhiteSpace(search?.FtsMatch);
         var list = QueryCapabilities.IsListProjection(query);
         if (FolderInsightSql.For(query?.FolderInsight) is null
-            && QueryCapabilities.IsLocalTitleSort(query, hasFts)
+            && (QueryCapabilities.IsLocalTitleSort(query, hasFts)
+                || (!hasFts && page.Sorts.Count == 1 && page.Sorts[0] == "titleDesc" && TrackQueryIndexes.Ready(database, "refined")))
             && TryReadIndexedTitlePage(database, query, page, search, list) is { } indexed)
         {
             return indexed;
         }
 
-        return ReadUnifiedLocalPage(database, query, page, search, hasFts, list);
+        return ReadUnifiedLocalPage(database, query, page, search, hasFts, list, allowUnindexedTextSort);
     }
 
     private static LibraryPageDto<LibraryTrackListRowDto>? TryReadIndexedTitlePage(
@@ -46,7 +52,9 @@ public static class TrackPageQuery
         }
 
         var columns = TrackFilterColumns.Local;
-        var extra = BuildTrackPredicates(query, page, search, columns, includeYearAndExclude: true);
+        var descending = page.Sorts[0] == "titleDesc";
+        var extra = BuildTrackPredicates(query, page, search, columns, includeYearAndExclude: true,
+            indexedExcludes: TrackQueryIndexes.Ready(database, "exclude"));
         var duplicateJoin = page.HideDuplicates
             ? SqlFragments.DuplicateMembersJoin("sort_keys.track_id")
             : string.Empty;
@@ -66,7 +74,7 @@ public static class TrackPageQuery
                 {duplicateJoin}
                 {filterSql}
                 """;
-            var pageSql = IndexedTrackTitleSql.Page(list, duplicateJoin, filterSql);
+            var pageSql = IndexedTrackTitleSql.Page(list, duplicateJoin, filterSql, descending);
             QueryPlanDiagnostics.Capture(database, "tracks.indexed.count", countSql, command => BindDuplicateAndExtra(command, page, extra));
             QueryPlanDiagnostics.Capture(database, "tracks.indexed.page", pageSql, command =>
             {
@@ -95,21 +103,21 @@ public static class TrackPageQuery
         }
         else
         {
+            var source = TrackQueryIndexes.PreferFolderSource(database, page) ? TrackQueryIndexes.FolderSource
+                : "FROM local_track_sort_keys AS sort_keys INDEXED BY idx_local_track_sort_keys_title CROSS JOIN tracks ON tracks.id = sort_keys.track_id";
             var trackWhere = SqlFragments.And("WHERE tracks.missing = 0 AND tracks.library_hidden = 0", string.Join(" AND ", new[] { duplicateFilter, extra.Sql }.Where(static part => part.Length > 0)));
             var pageSql = $"""
                 SELECT {TrackSelectSql.ForList(list)}
-                FROM local_track_sort_keys AS sort_keys
-                INNER JOIN tracks ON tracks.id = sort_keys.track_id
+                {source}
                 {duplicateJoin}
                 {trackWhere}
-                ORDER BY {TrackOrderSql.IndexedTitleOrder}
+                ORDER BY {IndexedTrackTitleSql.Order(descending)}
                 LIMIT ? OFFSET ?
                 """;
             var countSql = $"""
                 SELECT COUNT(*)
-                FROM local_track_sort_keys AS sort_keys
-                INNER JOIN tracks ON tracks.id = sort_keys.track_id
-                {duplicateJoin}
+                FROM tracks
+                {(page.HideDuplicates ? SqlFragments.DuplicateMembersJoin("tracks.id") : string.Empty)}
                 {trackWhere}
                 """;
             QueryPlanDiagnostics.Capture(database, "tracks.indexedFiltered.count", countSql, command => BindDuplicateAndExtra(command, page, extra));
@@ -155,15 +163,19 @@ public static class TrackPageQuery
         NormalizedPage page,
         CoreNormalizedTrackSearch? search,
         bool hasFts,
-        bool list)
+        bool list,
+        bool allowUnindexedTextSort)
     {
-        if (!PersistedSortKeys.AreTrackKeysFresh(database))
-        {
-            throw new UnsupportedQueryException("local_track_sort_keys are stale; writer must sync before Core can order local pages.");
-        }
+        var useTextKeys = PersistedSortKeys.UseTextKeys(database, PersistedSortKeys.AreTrackKeysFresh(database),
+            allowUnindexedTextSort, "local_track_sort_keys are stale; writer must sync before Core can order local pages.");
+        var sortJoin = useTextKeys ? "INNER JOIN local_track_sort_keys AS sort_keys ON sort_keys.track_id = tracks.id" : string.Empty;
+        var textColumns = useTextKeys
+            ? "sort_keys.title_key, sort_keys.title_text, sort_keys.artist_key, sort_keys.artist_text, sort_keys.album_key, sort_keys.album_text"
+            : "tracks.title AS title_key, tracks.title AS title_text, tracks.artist AS artist_key, tracks.artist AS artist_text, tracks.album AS album_key, tracks.album AS album_text";
 
         var columns = TrackFilterColumns.Local;
-        var extra = BuildTrackPredicates(query, page, search, columns, includeYearAndExclude: true);
+        var extra = BuildTrackPredicates(query, page, search, columns, includeYearAndExclude: true,
+            indexedExcludes: TrackQueryIndexes.Ready(database, "exclude"));
         var useDuplicateJoin = page.HideDuplicates || page.ShowDuplicatesOnly;
         var duplicateJoin = useDuplicateJoin
             ? SqlFragments.DuplicateMembersJoin("tracks.id")
@@ -174,7 +186,14 @@ public static class TrackPageQuery
         var ftsJoin = hasFts ? "INNER JOIN tracks_fts ON tracks_fts.rowid = tracks.rowid" : string.Empty;
         var searchRank = hasFts ? "bm25(tracks_fts)" : "0";
         var playback = TrackOrderSql.NeedsPlaybackStats(page.Sorts);
-        var playbackCte = playback
+        var indexedPlayback = playback && useTextKeys && TrackQueryIndexes.Ready(database, "playback");
+        var indexedOrder = useTextKeys && TrackQueryIndexes.Ready(database, "order");
+        var refined = useTextKeys && TrackQueryIndexes.Ready(database, "refined");
+        var orderedSource = indexedOrder && !hasFts
+            ? TrackQueryIndexes.PreferFolderSource(database, page) ? TrackQueryIndexes.FolderSource
+                : TrackQueryIndexes.OrderedSource(page.Sorts, indexedPlayback, refined)
+            : null;
+        var playbackCte = playback && !indexedPlayback
             ? """
               local_playback_stats AS (
                 SELECT track_id, SUM(completed_count) AS play_count, MAX(last_started_at) AS last_played_at
@@ -184,40 +203,46 @@ public static class TrackPageQuery
               ),
               """
             : string.Empty;
-        var playbackColumns = playback
-            ? "COALESCE(local_playback_stats.play_count, 0) AS play_count, local_playback_stats.last_played_at AS last_played_at"
+        var playCountSql = indexedPlayback ? "sort_keys.playback_sort_count"
+            : playback ? "MAX(COALESCE(tracks.play_count, 0), COALESCE(local_playback_stats.play_count, 0))" : "tracks.play_count";
+        var lastPlayedSql = indexedPlayback ? "sort_keys.playback_sort_last"
+            : playback ? "local_playback_stats.last_played_at" : "tracks.last_played_at";
+        var playbackColumns = indexedPlayback ? $"{playCountSql} AS play_count, {lastPlayedSql} AS last_played_at" : playback
+            ? "MAX(COALESCE(tracks.play_count, 0), COALESCE(local_playback_stats.play_count, 0)) AS play_count, local_playback_stats.last_played_at AS last_played_at"
             : "tracks.play_count, tracks.last_played_at";
-        var playbackJoin = playback ? "LEFT JOIN local_playback_stats ON local_playback_stats.track_id = tracks.id" : string.Empty;
+        var playbackJoin = playback && !indexedPlayback ? "LEFT JOIN local_playback_stats ON local_playback_stats.track_id = tracks.id" : string.Empty;
         var whereSql = SqlFragments.And(
             hasFts
                 ? $"WHERE tracks.missing = 0 AND tracks.library_hidden = 0{(duplicateFilter.Length > 0 ? $" AND {duplicateFilter}" : string.Empty)} AND tracks_fts MATCH ?"
                 : $"WHERE tracks.missing = 0 AND tracks.library_hidden = 0{(duplicateFilter.Length > 0 ? $" AND {duplicateFilter}" : string.Empty)}",
             extra.Sql);
-        var orderSql = TrackOrderSql.ForSorts(page.Sorts, hasFts);
+        var orderSql = TrackOrderSql.ForSorts(page.Sorts, hasFts, indexedPlayback);
+        var orderField = (string field) => refined ? $"sort_keys.order_{field} AS {field}" : $"tracks.{field}";
         // Prefix search starts at the FTS hit list. The page projection keeps only
         // the columns that ORDER BY reads, then hydrates that one page.
         var searchRelations = $"""
             FROM tracks_fts
             INNER JOIN tracks ON tracks.rowid = tracks_fts.rowid
-            INNER JOIN local_track_sort_keys AS sort_keys ON sort_keys.track_id = tracks.id
+            {sortJoin}
             {duplicateJoin}
             """;
         var searchHitSelect = TrackOrderSql.SearchHitSelect(
             page.Sorts,
             searchActive: true,
             searchRankSql: "bm25(tracks_fts)",
-            playCountSql: playback ? "COALESCE(local_playback_stats.play_count, 0)" : "tracks.play_count",
-            lastPlayedSql: playback ? "local_playback_stats.last_played_at" : "tracks.last_played_at");
+            playCountSql: playCountSql, lastPlayedSql: lastPlayedSql, useTextKeys: useTextKeys);
         var countSql = hasFts
             ? $"""
                 SELECT COUNT(*)
-                {searchRelations}
+                FROM tracks_fts
+                INNER JOIN tracks ON tracks.rowid = tracks_fts.rowid
+                {duplicateJoin}
                 {whereSql}
                 """
             : $"""
                 SELECT COUNT(*)
                 FROM tracks
-                INNER JOIN local_track_sort_keys AS sort_keys ON sort_keys.track_id = tracks.id
+                {(indexedOrder ? string.Empty : sortJoin)}
                 {ftsJoin}
                 {duplicateJoin}
                 {whereSql}
@@ -239,7 +264,7 @@ public static class TrackPageQuery
             : $"""
                 WITH {playbackCte} library_ids AS (
                   SELECT
-                    tracks.id,
+                    {(useTextKeys ? "sort_keys.track_id" : "tracks.id")} AS id,
                     tracks.path,
                     tracks.created_at,
                     tracks.updated_at,
@@ -249,21 +274,15 @@ public static class TrackPageQuery
                     tracks.size_bytes,
                     tracks.bitrate,
                     tracks.bpm,
-                    tracks.codec,
-                    tracks.sample_rate,
-                    tracks.bit_depth,
+                    {orderField("codec")},
+                    {orderField("sample_rate")},
+                    {orderField("bit_depth")},
                     {playbackColumns},
                     {searchRank} AS search_rank,
-                    sort_keys.title_key,
-                    sort_keys.title_text,
-                    sort_keys.artist_key,
-                    sort_keys.artist_text,
-                    sort_keys.album_key,
-                    sort_keys.album_text,
-                    tracks.disc_no,
-                    tracks.track_no
-                  FROM tracks
-                  INNER JOIN local_track_sort_keys AS sort_keys ON sort_keys.track_id = tracks.id
+                    {textColumns},
+                    {orderField("disc_no")},
+                    {orderField("track_no")}
+                  {orderedSource ?? $"FROM tracks {sortJoin}"}
                   {ftsJoin}
                   {duplicateJoin}
                   {playbackJoin}
@@ -278,19 +297,19 @@ public static class TrackPageQuery
         using var transaction = database.BeginDeferredRead();
         QueryPlanDiagnostics.Capture(database, "tracks.unified.count", countSql, command => BindUnified(command, page, extra, search, hasFts, useDuplicateJoin, includeLimit: false));
         QueryPlanDiagnostics.Capture(database, "tracks.unified.ids", idSql, command => BindUnified(command, page, extra, search, hasFts, useDuplicateJoin, includeLimit: true));
-        var total = page.TotalHint ?? Count(
-            database,
-            countSql,
-            command => BindUnified(command, page, extra, search, hasFts, useDuplicateJoin, includeLimit: false));
         var ids = new List<string>();
         ReadRows(database, idSql, command => BindUnified(command, page, extra, search, hasFts, useDuplicateJoin, includeLimit: true), reader =>
         {
             ids.Add(Convert.ToString(reader[0]) ?? string.Empty);
         });
+        var total = page.TotalHint ?? (!hasFts && extra.Sql.Length == 0 && !page.ShowDuplicatesOnly
+            ? ResolveIndexedTotal(database, page, ids.Count, false, countSql, extra)
+            : Count(database, countSql,
+                command => BindUnified(command, page, extra, search, hasFts, useDuplicateJoin, includeLimit: false)));
         var items = HydrateTracks(database, ids, list);
         if (playback)
         {
-            OverlayPlaybackStats(database, items);
+            OverlayPlaybackStats(database, items, indexedPlayback);
         }
 
         return new LibraryPageDto<LibraryTrackListRowDto>
@@ -303,12 +322,13 @@ public static class TrackPageQuery
         };
     }
 
-    private static PredicateSql BuildTrackPredicates(
+    internal static PredicateSql BuildTrackPredicates(
         CoreLibraryPageQuery? query,
         NormalizedPage page,
         CoreNormalizedTrackSearch? search,
         TrackFilterColumns columns,
-        bool includeYearAndExclude)
+        bool includeYearAndExclude,
+        bool indexedExcludes = false)
     {
         var clauses = new List<string>();
         var parameters = new List<object?>();
@@ -330,6 +350,9 @@ public static class TrackPageQuery
             clauses.Add(file);
         }
 
+        var lyrics = LyricsFilterSql.Filter(query?.LyricsFilter, columns.Id);
+        if (lyrics.Length > 0) clauses.Add(lyrics);
+
         var vocal = VocalPresenceSql.Filter(query?.VocalFilter, columns.Id, columns.Title, columns.Album);
         if (vocal.Length > 0)
         {
@@ -349,7 +372,7 @@ public static class TrackPageQuery
 
         if (includeYearAndExclude && search?.Excludes is { Count: > 0 } excludes)
         {
-            clauses.Add(SqlFragments.ExcludeSql(columns, excludes));
+            clauses.Add(indexedExcludes ? TrackQueryIndexes.Excludes(columns, excludes) : SqlFragments.ExcludeSql(columns, excludes));
             parameters.AddRange(SqlFragments.ExcludeParams(excludes));
         }
 
@@ -430,19 +453,24 @@ public static class TrackPageQuery
         return items;
     }
 
-    private static void OverlayPlaybackStats(ReadOnlyLibraryDatabase database, List<LibraryTrackListRowDto> items)
+    private static void OverlayPlaybackStats(ReadOnlyLibraryDatabase database, List<LibraryTrackListRowDto> items, bool indexed = false)
     {
         if (items.Count == 0)
         {
             return;
         }
 
-        var sql = $"""
-            SELECT track_id, SUM(completed_count) AS play_count, MAX(last_started_at) AS last_played_at
-            FROM playback_history_stats
-            WHERE media_type = 'local'
-              AND track_id {SqlFragments.JsonEachIds}
-            GROUP BY track_id
+        var sql = indexed ? """
+            SELECT sort_keys.track_id AS id, sort_keys.playback_sort_count AS play_count,
+                   sort_keys.playback_sort_last AS last_played_at
+            FROM json_each(?) AS requested
+            INNER JOIN local_track_sort_keys AS sort_keys ON sort_keys.track_id = requested.value
+            """ : $"""
+            SELECT tracks.id, MAX(COALESCE(tracks.play_count, 0), COALESCE(SUM(history.completed_count), 0)) AS play_count,
+                   MAX(history.last_started_at) AS last_played_at
+            FROM tracks LEFT JOIN playback_history_stats history ON history.track_id=tracks.id AND history.media_type='local'
+            WHERE tracks.id {SqlFragments.JsonEachIds}
+            GROUP BY tracks.id
             """;
         var byId = items.ToDictionary(static item => item.Id, StringComparer.Ordinal);
         ReadRows(database, sql, command => command.Add(System.Text.Json.JsonSerializer.Serialize(items.ConvertAll(static item => item.Id))), reader =>
@@ -453,7 +481,7 @@ public static class TrackPageQuery
                 return;
             }
 
-            track.PlayCount = Math.Max(0, Convert.ToInt32(reader[1] ?? 0));
+            track.PlayCount = Math.Max(track.PlayCount, Convert.ToInt32(reader[1] ?? 0));
             track.LastPlayedAt = LibraryText.TextOrNull(reader.IsDBNull(2) ? null : reader.GetValue(2));
         });
     }
@@ -487,8 +515,13 @@ public static class TrackPageQuery
         if (!hasTrackPredicates && page.TotalHint is null
             && PersistedSortKeys.TryTrackPresentCount(database) is { } cached)
         {
-            var libraryHidden = Count(database,
-                "SELECT COUNT(*) FROM tracks WHERE library_hidden = 1 AND missing = 0", _ => { });
+            // Select the small hidden set before checking presence, so SQLite
+            // cannot choose the broad missing=0 sample-rate index for this count.
+            var libraryHidden = Count(database, """
+                WITH hidden AS MATERIALIZED (SELECT id FROM tracks WHERE library_hidden = 1)
+                SELECT COUNT(*) FROM hidden CROSS JOIN tracks ON tracks.id = hidden.id
+                WHERE tracks.missing = 0
+                """, _ => { });
             var visible = Math.Max(0, cached - libraryHidden);
             if (!page.HideDuplicates)
             {
@@ -566,7 +599,7 @@ public static class TrackPageQuery
         }
     }
 
-    private readonly record struct PredicateSql(string Sql, IReadOnlyList<object?> Parameters);
+    internal readonly record struct PredicateSql(string Sql, IReadOnlyList<object?> Parameters);
 }
 
 public sealed class UnsupportedQueryException : Exception

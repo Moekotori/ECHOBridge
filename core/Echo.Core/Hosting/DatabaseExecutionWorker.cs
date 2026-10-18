@@ -279,7 +279,7 @@ public sealed class DatabaseExecutionWorker : IDisposable
 
     private static bool IsPreemptibleRead(CoreRequest request) => request.Method switch
     {
-        "getScanCacheStates" or "classifyScanFiles" or "getScanMarkedMissing"
+        "playbackQueueRead" or "getScanCacheStates" or "classifyScanFiles" or "getScanMarkedMissing"
             or "readNativeMetadata" or "getScanCue" or "resolveCoverCandidate" or "prepareAsciiSearchTerms" or "getTracks" or "getAlbumTracks" or "getArtistTracks" or "getGenreTracks"
             or "getArtists" or "getAlbums" or "getGenres" or "getAlbumForTrack"
             or "getDuplicateIndexSummary" or "getDuplicateHiddenCounts"

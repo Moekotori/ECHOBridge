@@ -116,8 +116,12 @@ public sealed class SortKeyMaintenance
     {
         var fields = schema.KeyNames.SelectMany(name => new[] { $"{name}_key", $"{name}_text" }).ToArray();
         var columns = new[] { schema.IdColumn }.Concat(fields).Append(schema.UpdatedColumn).ToArray();
-        var sql = $"INSERT INTO {schema.Table} ({string.Join(',', columns)}) VALUES(" +
-            string.Join(',', columns.Select((_, i) => $"$p{i}")) + $") ON CONFLICT({schema.IdColumn}) DO UPDATE SET " +
+        var writeView = schema.Kind == "track" && Scalar(connection, tx,
+            "SELECT 1 FROM sqlite_master WHERE type='view' AND name='local_track_sort_key_writes'") is not null;
+        var target = writeView ? "local_track_sort_key_writes" : schema.Table;
+        var sql = $"INSERT INTO {target} ({string.Join(',', columns)}) VALUES(" +
+            string.Join(',', columns.Select((_, i) => $"$p{i}")) + ")";
+        if (!writeView) sql += $" ON CONFLICT({schema.IdColumn}) DO UPDATE SET " +
             string.Join(',', columns.Skip(1).Select(column => $"{column}=excluded.{column}"));
         using var command = Command(connection, tx, sql, new object?[columns.Length]);
         for (var index = 0; index < rows.Count; index++)

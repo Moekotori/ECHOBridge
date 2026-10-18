@@ -9,15 +9,23 @@ public sealed class RequestExecutor : IDisposable
     private readonly Echo.Core.Maintenance.SortKeyMaintenance _sortKeys = new();
     private readonly Echo.Core.Maintenance.GenrePageMaintenance _genres = new();
     public void ReleaseIdleMaintenance() { _sortKeys.ReleasePending(); _genres.Clear(); }
+    private readonly Echo.Core.Queues.PlaybackQueueStorage _queueStorage = new();
     private readonly ReadOnlyLibraryDatabase _database;
     private long _authorizedGeneration = -1;
     private string? _authorizedPath;
+    private readonly bool _allowUnindexedTextSort;
+    private readonly bool _useRequestedPlaylistSort;
 
-    public RequestExecutor(int databaseBudgetParts = 4) => _database = new(databaseBudgetParts);
+    public RequestExecutor(int databaseBudgetParts = 4, bool allowUnindexedTextSort = false, bool useRequestedPlaylistSort = false)
+    {
+        _database = new(databaseBudgetParts);
+        _allowUnindexedTextSort = allowUnindexedTextSort;
+        _useRequestedPlaylistSort = useRequestedPlaylistSort;
+    }
 
     public void ReleaseIdleDatabase() => _database.Close();
 
-    public void InterruptActiveRead() => _database.InterruptReads();
+    public void InterruptActiveRead() { _database.InterruptReads(); _queueStorage.Interrupt(); }
 
     public object? Execute(CoreRequest request)
     {
@@ -25,6 +33,8 @@ public sealed class RequestExecutor : IDisposable
         {
             "handshake" => Handshake(request),
             "ping" => new PingResult(),
+            "lastFmImport" => WithOpenDatabase(request, _ => Echo.Core.Playlists.LastFmImportCommands.Execute(_authorizedPath!,
+                request.Params?.LastFmImport ?? throw new ArgumentException("Last.fm import page required."), request.Cancellation)),
             "scanJobCommand" => WithOpenDatabase(request, _ => Echo.Core.Writes.ScanJobWriter.Execute(_authorizedPath!, request.Params?.ScanJobCommand
                 ?? throw new ArgumentException("Scan task command required."))),
             "libraryMutation" => WithOpenDatabase(request, _ => Echo.Core.Writes.LibraryMutations.Execute(_authorizedPath!, request.Params?.LibraryMutation ?? throw new ArgumentException("Mutation required."), request.Cancellation)),
@@ -68,31 +78,44 @@ public sealed class RequestExecutor : IDisposable
             "discardSortKeys" => WithOpenDatabase(request, _ => request.Params?.SortKeyMaintenance?.Kind == "genre"
                 ? _genres.Discard(request.Params.SortKeyMaintenance.Token) : _sortKeys.Discard(request.Params?.SortKeyMaintenance?.Token)),
             "getAlbumForTrack" => WithOpenDatabase(request, database => AlbumForTrackQuery.Execute(database, request.Params?.TrackId)),
+            "searchGlobalCatalog" => WithOpenDatabase(request, database => request.Params?.CatalogQuery is { } catalog
+                ? request.Params.TrackIds is { } ids && catalog.Kind is { } kind
+                    ? GlobalCatalogQuery.Hydrate(database,kind,ids) : GlobalCatalogQuery.Execute(database,catalog,request.Params.SearchOptions)
+                : throw new ArgumentException("Catalog query required.")),
+            "getArtistPageFacts" => WithOpenDatabase(request,database => ArtistFactsQuery.Execute(database,
+                request.Params?.ArtistId ?? throw new ArgumentException("Artist ID required."),request.Params.SearchOptions)),
+            "getArtistInsights" => WithOpenDatabase(request,database => ArtistInsightsQuery.Execute(database,
+                request.Params?.ArtistId ?? throw new ArgumentException("Artist ID required."),request.Params.ArtistInsightsOptions,request.Params.SearchOptions,request.Cancellation)),
+            "playbackQueueRead" or "playbackQueueCommand" => WithOpenDatabase(request, database => _queueStorage.Execute(
+                request.Params?.PlaybackQueue ?? throw new ArgumentException("Queue request required."),database,request.Cancellation,
+                request.Method == "playbackQueueCommand")),
             "getSummary" => WithOpenDatabase(request, LibrarySummaryQuery.Execute),
             "getTracks" => WithOpenDatabase(request, database =>
             {
                 SearchContract.EnsureExecutable(request.Params?.Query, request.Params?.NormalizedSearch);
-                var page = TrackPageQuery.Execute(database, request.Params?.Query, request.Params?.NormalizedSearch);
+                var page = TrackPageQuery.Execute(database, request.Params?.Query, request.Params?.NormalizedSearch, _allowUnindexedTextSort);
                 QueryPlanDiagnostics.Persist();
                 return page;
             }),
             "getAlbums" => WithOpenDatabase(request, database =>
             {
                 SearchContract.EnsureExecutableEntity(request.Params?.Query, request.Params?.NormalizedEntitySearch);
-                var page = AlbumPageQuery.Execute(database, request.Params?.Query, request.Params?.NormalizedEntitySearch);
+                var page = AlbumPageQuery.Execute(database, request.Params?.Query, request.Params?.NormalizedEntitySearch, _allowUnindexedTextSort);
                 QueryPlanDiagnostics.Persist();
                 return page;
             }),
             "getArtists" => WithOpenDatabase(request, database =>
             {
+                if (request.Params?.Query?.ArtistGrouping == "albumArtist")
+                    return AlbumArtistQueries.Artists(database,request.Params.Query,request.Params.SearchOptions);
                 SearchContract.EnsureExecutableEntity(request.Params?.Query, request.Params?.NormalizedEntitySearch);
-                var page = ArtistPageQuery.Execute(database, request.Params?.Query, request.Params?.NormalizedEntitySearch);
+                var page = ArtistPageQuery.Execute(database, request.Params?.Query, request.Params?.NormalizedEntitySearch, _allowUnindexedTextSort);
                 QueryPlanDiagnostics.Persist();
                 return page;
             }),
             "getGenres" => WithOpenDatabase(request, database =>
             {
-                var page = GenrePageQuery.Execute(database, request.Params?.Query);
+                var page = GenrePageQuery.Execute(database, request.Params?.Query, _allowUnindexedTextSort);
                 QueryPlanDiagnostics.Persist();
                 return page;
             }),
@@ -103,9 +126,13 @@ public sealed class RequestExecutor : IDisposable
                 return page;
             }),
             "getArtistAlbums" => WithOpenDatabase(request, database =>
-                ArtistAlbumPageQuery.Execute(database, request.Params?.ArtistId, request.Params?.Query)),
+                AlbumArtistQueries.LocalKey(request.Params?.ArtistId) is not null
+                    ? AlbumArtistQueries.Page(database,request.Params!.ArtistId!,request.Params.Query,request.Params.SearchOptions,true)
+                    : ArtistAlbumPageQuery.Execute(database, request.Params?.ArtistId, request.Params?.Query, _allowUnindexedTextSort, request.Params?.NormalizedEntitySearch)),
             "getArtistTracks" => WithOpenDatabase(request, database =>
             {
+                if (AlbumArtistQueries.LocalKey(request.Params?.ArtistId) is not null)
+                    return AlbumArtistQueries.Page(database,request.Params!.ArtistId!,request.Params.Query,request.Params.SearchOptions,false);
                 var page = ArtistTrackPageQuery.Execute(
                     database,
                     request.Params?.ArtistId,
@@ -225,7 +252,7 @@ public sealed class RequestExecutor : IDisposable
                 var page = FolderTracksQuery.Execute(
                     database,
                     request.Params?.Query,
-                    request.Params?.NormalizedEntitySearch);
+                    request.Params?.NormalizedEntitySearch, _allowUnindexedTextSort);
                 QueryPlanDiagnostics.Persist();
                 return page;
             }),
@@ -236,7 +263,8 @@ public sealed class RequestExecutor : IDisposable
                     database,
                     request.Params?.PlaylistId,
                     request.Params?.Query,
-                    request.Params?.NormalizedEntitySearch, favoritePage: request.Method == "getFavoriteItems");
+                    request.Params?.NormalizedEntitySearch, favoritePage: request.Method == "getFavoriteItems",
+                    allowUnindexedTextSort: _allowUnindexedTextSort, useRequestedSort: _useRequestedPlaylistSort);
                 QueryPlanDiagnostics.Persist();
                 return page;
             }),
@@ -244,7 +272,7 @@ public sealed class RequestExecutor : IDisposable
         };
     }
 
-    public void Dispose() { _sortKeys.Clear(); _genres.Clear(); _database.Dispose(); }
+    public void Dispose() { _sortKeys.Clear(); _genres.Clear(); _queueStorage.Dispose(); _database.Dispose(); }
 
     private HandshakeResult Handshake(CoreRequest request)
     {
@@ -279,6 +307,7 @@ public sealed class RequestExecutor : IDisposable
             result.Capabilities.Add(Echo.Core.Writes.ScanExecutionDispatcher.Capability);
         result.Capabilities.Add(ScanChangedFilesQuery.CueRevisionCapability);
         result.Capabilities.Add(CoreExecutionLanes.ParallelMediaCapabilityV2);
+        result.Capabilities.Add(Echo.Core.Playlists.CloudPlaylistCommands.Capability);
         return result;
     }
 
@@ -286,6 +315,7 @@ public sealed class RequestExecutor : IDisposable
     {
         _sortKeys.Clear();
         _genres.Clear();
+        _queueStorage.Close();
         _database.Close();
         _authorizedPath = null;
         _authorizedGeneration = -1;

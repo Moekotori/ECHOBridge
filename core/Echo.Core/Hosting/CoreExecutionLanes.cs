@@ -52,6 +52,7 @@ public sealed class CoreExecutionLanes : IDisposable
     }
 
     public static bool IsAggregate(string method) => method is
+        "playbackQueueRead" or "playbackQueueCommand" or
         "getPlaybackHistorySummary" or "getPlaybackStatsDashboard" or "getPlaybackStatsDashboardActivity"
         or "getPlaybackStatsInsights" or "getPlaybackMemoryGraph" or "getSteamAchievementHistoryStats"
         or "getFolderOverviews" or "getAlbumFocusFacets" or "rebuildDuplicateIndex"
@@ -59,7 +60,7 @@ public sealed class CoreExecutionLanes : IDisposable
         or "getDuplicateIndexSummary" or "getDuplicateHiddenCounts" or "getLikedTrackIds" or "getLikedAlbumIds"
         or "getDuplicateVersionsPage" or "getDuplicatePreviewPage"
         or "libraryMutation" or "scanFinalize" or "scanJobCommand" or "cleanupPage" or "prepareFavorites"
-        or "playlistCommand" or "personalTagCommand" or "playbackCommand"
+        or "playlistCommand" or "personalTagCommand" or "playbackCommand" or "lastFmImport"
         or "prepareSortKeys" or "commitSortKeys" or "discardSortKeys"
         or "getExistingTrackPaths" or "getScanCacheStates" or "classifyScanFiles" or "getScanMarkedMissing" or "getCueTrackRefs";
 

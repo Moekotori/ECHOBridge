@@ -28,6 +28,7 @@ public sealed class CoreRequest
 
 public sealed class CoreRequestParams
 {
+    public PlaybackQueueRequest? PlaybackQueue { get; set; }
     public ScanCueRequest? ScanCue { get; set; }
     public ScanJobCommand? ScanJobCommand { get; set; }
     public LibraryMutation? LibraryMutation { get; set; }
@@ -49,6 +50,7 @@ public sealed class CoreRequestParams
     public PersonalTagCommand? PersonalTagCommand { get; set; }
     [JsonPropertyName("playbackCommand")]
     public PlaybackCommand? PlaybackCommand { get; set; }
+    public List<LastFmImportTrack>? LastFmImport { get; set; }
     [JsonPropertyName("normalizeSearch")]
     public bool NormalizeSearch { get; set; }
 
@@ -77,6 +79,9 @@ public sealed class CoreRequestParams
 
     [JsonPropertyName("query")]
     public CoreLibraryPageQuery? Query { get; set; }
+
+    public CoreCatalogQuery? CatalogQuery { get; set; }
+    public CoreArtistInsightsOptions? ArtistInsightsOptions { get; set; }
 
     [JsonPropertyName("folderChildren")]
     public CoreFolderChildrenQuery? FolderChildren { get; set; }
@@ -206,6 +211,9 @@ public sealed class CoreLibraryPageQuery
     [JsonPropertyName("totalHint")]
     public int? TotalHint { get; set; }
 
+    [JsonPropertyName("titleJumpLetter")]
+    public string? TitleJumpLetter { get; set; }
+
     [JsonPropertyName("search")]
     public string? Search { get; set; }
 
@@ -220,6 +228,9 @@ public sealed class CoreLibraryPageQuery
 
     [JsonPropertyName("fileFormatFilter")]
     public string? FileFormatFilter { get; set; }
+
+    [JsonPropertyName("lyricsFilter")]
+    public string? LyricsFilter { get; set; }
 
     [JsonPropertyName("vocalFilter")]
     public string? VocalFilter { get; set; }
@@ -448,6 +459,10 @@ public sealed class LibrarySummaryDto
 
 public sealed class LibraryPageDto<T>
 {
+    [JsonPropertyName("titleJumpOffset")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public long? TitleJumpOffset { get; set; }
+
     [JsonPropertyName("items")]
     public List<T> Items { get; set; } = [];
 

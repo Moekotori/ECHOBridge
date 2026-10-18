@@ -61,7 +61,9 @@ public static class PlaylistItemsQuery
         string? playlistId,
         CoreLibraryPageQuery? query,
         CoreNormalizedEntitySearch? search,
-        bool favoritePage = false)
+        bool favoritePage = false,
+        bool allowUnindexedTextSort = false,
+        bool useRequestedSort = false)
     {
         if (!QueryCapabilities.SupportsPlaylistItems(playlistId, query))
         {
@@ -70,6 +72,12 @@ public static class PlaylistItemsQuery
 
         SearchContract.EnsureExecutableEntity(query, search);
         var page = PageQueryNormalizer.Normalize(query);
+        if (allowUnindexedTextSort)
+        {
+            using var temporary = database.RequireConnection().CreateCommand();
+            temporary.CommandText = "PRAGMA temp_store=FILE";
+            temporary.ExecuteNonQuery();
+        }
         // Pin metadata, key revision and rows to the same SQLite snapshot.
         using var transaction = database.BeginDeferredRead();
         var playlist = ReadPlaylist(database, playlistId!);
@@ -79,8 +87,10 @@ public static class PlaylistItemsQuery
             return Echo.Core.SmartPlaylists.SmartPlaylistQueries.Page(database,playlistId!,query);
         }
         var snapshotOrder = favoritePage || (playlist.Kind == "system" && playlist.SourcePlaylistId is "liked-tracks" or "liked-albums");
-        var needsKeys = snapshotOrder && PlaylistSnapshotOrderSql.NeedsKeys(favoritePage ? query?.Sort : playlist.SortMode);
-        if (needsKeys && !PersistedSortKeys.AreFresh(database, "local_playlist_sort_key_revision", "local_playlist_sort_keys.synced_revision"))
+        var sort = favoritePage || useRequestedSort ? query?.Sort : playlist.SortMode;
+        var needsKeys = snapshotOrder && PlaylistSnapshotOrderSql.NeedsKeys(sort);
+        var useTextKeys = needsKeys && PersistedSortKeys.AreFresh(database, "local_playlist_sort_key_revision", "local_playlist_sort_keys.synced_revision");
+        if (needsKeys && !useTextKeys && !allowUnindexedTextSort)
             throw new PlaylistSortKeysNotReadyException();
 
         var like = SqlFragments.LikeEntityFilter(
@@ -100,9 +110,9 @@ public static class PlaylistItemsQuery
         }
         if (like.Sql.Length > 0) whereSql += $" AND {like.Sql}";
         parameters.AddRange(like.Parameters.Cast<object?>());
-        var orderSql = favoritePage ? FavoriteItemsSql.Order(query?.Sort)
-            : snapshotOrder ? PlaylistSnapshotOrderSql.For(playlist.SortMode) : PlaylistItemsOrderSql.For(playlist.SortMode);
-        var keyJoin = needsKeys ? "LEFT JOIN local_playlist_sort_keys playlist_keys ON playlist_keys.item_id=playlist_items.id" : "";
+        var orderSql = favoritePage ? FavoriteItemsSql.Order(sort, useTextKeys)
+            : snapshotOrder ? PlaylistSnapshotOrderSql.For(sort, useTextKeys) : PlaylistItemsOrderSql.For(sort);
+        var keyJoin = useTextKeys ? "LEFT JOIN local_playlist_sort_keys playlist_keys ON playlist_keys.item_id=playlist_items.id" : "";
         var countSql = $"""
             SELECT COUNT(*)
             FROM playlist_items

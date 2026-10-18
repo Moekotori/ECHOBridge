@@ -22,9 +22,13 @@ public sealed class PlaylistCommand : IRecoverableCommand
     public string? PlaylistId { get; set; }
     public string? ItemId { get; set; }
     public List<string>? TrackIds { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? AfterItemId { get; set; }
     public int TargetPosition { get; set; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     public JsonElement Patch { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public JsonElement CloudPlaylist { get; set; }
     public string? BackupDirectory { get; set; }
 }
 
@@ -33,6 +37,8 @@ public sealed record PlaylistCommandResult(string? PlaylistId, List<string> Item
 
 public sealed class PlaylistManagementRequest
 {
+    public string? ItemId { get; set; }
+    public string? TrackId { get; set; }
     public string Action { get; set; } = "";
     public string? PlaylistId { get; set; }
     public List<string>? ItemIds { get; set; }

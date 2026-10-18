@@ -9,3 +9,5 @@
 请求固定访问 api.github.com/repos/Moekotori/ECHOBridge/releases、github.com 的该仓库附件与 release-assets.githubusercontent.com 重定向。只发送固定程序名与版本号，无 token、登录、遥测或曲库上传。元数据 1 MiB，下载 256 MiB，解压 512 MiB/2048 项，一个更新暂存目录；流缓冲 64 KiB。
 
 此功能只装配在独立 Bridge 的 Windows 用户会话；Steam/ECHO 主程序没有这个更新链路。26.10.15.2 是首个带更新器的版本，此前版本需手动下载一次。
+
+26.10.18.1 起，更新器等待新实例完成窗口初始化并确认进程身份后才提交替换；初始化失败或确认超时会恢复旧版，仍保留用户额外文件和设置。

@@ -36,6 +36,7 @@ internal static class PlaylistManagementCommands
     internal static PlaylistCommandResult Execute(PlaylistSql sql, PlaylistManagementRequest request, string timestamp, string? backupDirectory)
     {
         var id = request.PlaylistId ?? "";
+        if (request.Action == "relink") return PlaylistRelinkCommand.Execute(sql, request, timestamp);
         if (request.Action.StartsWith("group-", StringComparison.Ordinal)) return PlaylistGroupCommands.Execute(sql,request);
         if (request.Action == "restore")
             return new(PlaylistRecovery.Restore(sql, request.HistoryId ?? "", timestamp), []);

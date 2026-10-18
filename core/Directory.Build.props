@@ -7,7 +7,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <InvariantGlobalization>false</InvariantGlobalization>
     <Deterministic>true</Deterministic>
-    <Version>26.10.15.2</Version>
+    <Version>26.10.18.1</Version>
     <DebugType>embedded</DebugType>
     <PathMap>$(MSBuildThisFileDirectory)=/_/core/</PathMap>
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>

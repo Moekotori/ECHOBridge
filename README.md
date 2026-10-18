@@ -2,7 +2,7 @@
 
 独立、轻量的 Windows 曲库共享程序。直接读取 ECHO 已有曲库，通过同一局域网中的 ECHO Link 分享给电脑和手机，不需要启动 Steam 或 ECHO 主程序。
 
-**Windows x64 便携版：[下载完整 ZIP](https://github.com/Moekotori/ECHOBridge/releases/download/v26.10.15.2/ECHO-Bridge-26.10.15.2-win-x64.zip)。Release 为预览版。**
+**Windows x64 便携版：[下载完整 ZIP](https://github.com/Moekotori/ECHOBridge/releases/download/v26.10.18.1/ECHO-Bridge-26.10.18.1-win-x64.zip)。Release 为预览版。**
 
 [Releases](https://github.com/Moekotori/ECHOBridge/releases) · [ECHO](https://github.com/Moekotori/ECHOSteam) · [构建说明](docs/BUILDING.md) · [验证范围](docs/VALIDATION.md)
 
@@ -21,7 +21,7 @@
 
 ## 使用
 
-下载 `ECHO-Bridge-26.10.15.2-win-x64.zip`，**完整解压**到固定目录，双击 `ECHO Bridge.exe`。不要直接在 ZIP 内运行，不要单独移动 EXE 或删除 DLL。无需安装 .NET，也无需启动 Steam。首次使用前先用兼容版本的 ECHO 建立并加载曲库；新版 ECHO 写入自动选择记录，旧版标准位置也会被检查，自定义位置可以手动选择。
+下载 `ECHO-Bridge-26.10.18.1-win-x64.zip`，**完整解压**到固定目录，双击 `ECHO Bridge.exe`。不要直接在 ZIP 内运行，不要单独移动 EXE 或删除 DLL。无需安装 .NET，也无需启动 Steam。首次使用前先用兼容版本的 ECHO 建立并加载曲库；新版 ECHO 写入自动选择记录，旧版标准位置也会被检查，自定义位置可以手动选择。
 
 
 Bridge 开启共享后，接收设备需要处于同一可信局域网并启用 ECHO Link。桌面使用附近电脑/曲库入口；支持 Bridge 的 Android 客户端在连接页选择设备，再浏览曲库并在手机播放。旧版客户端不保证识别 Bridge。

@@ -24,10 +24,12 @@ internal static class SmartPlaylistCommands
         if (request.Operation == "smartFreeze")
         {
             if (currentRules is null) throw new ArgumentException("Missing smart playlist rules");
-            var rules = SmartRuleNormalizer.Normalize(new JsonObject { ["rules"] = currentRules });
+            var rules = SmartPlaylistOrder.Normalize(currentRules);
             var query = SmartRuleSql.Build(rules, DateTimeOffset.Parse(timestamp));
             var trackIds = new List<string>();
-            using (var command = sql.Command($"SELECT tracks.id FROM tracks WHERE {query.Where} ORDER BY {query.Order} LIMIT {rules["limit"]}",query.Parameters.ToArray()))
+            var parameters = new List<object?>(query.Parameters);
+            var selectIds = SmartPlaylistOrder.SelectIds(query, rules, (int)SmartRuleValues.Number(rules["limit"])!, 0, parameters);
+            using (var command = sql.Command(selectIds,parameters.ToArray()))
             using (var reader = command.ExecuteReader()) { while (reader.Read()) trackIds.Add(reader.GetString(0)); }
             id = Guid.NewGuid().ToString();
             Insert(sql,id,SmartRuleValues.Clean(input["name"]) ?? currentName + "（固定）",description,"manual",timestamp);
@@ -36,6 +38,7 @@ internal static class SmartPlaylistCommands
         }
         if (request.Operation == "smartUpdate" && input["rules"] is null && currentRules is not null) input["rules"] = currentRules;
         var normalized = SmartRuleNormalizer.Normalize(input);
+        if (currentRules?["manualOrder"] is JsonArray order) normalized["manualOrder"] = order.DeepClone();
         if (request.Operation == "smartCreate")
         {
             id = Guid.NewGuid().ToString();

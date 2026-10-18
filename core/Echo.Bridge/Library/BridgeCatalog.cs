@@ -15,6 +15,7 @@ public sealed class BridgeCatalog(BridgeLibraryReader reader)
             throw new BridgeException(400, "invalid_peer_catalog_parent");
         var query = new CoreLibraryPageQuery { Page = page, PageSize = 50, Search = search, Sort = sort ?? "titleAsc", SourceProvider = "local" };
         var parameters = new CoreRequestParams { Query = query };
+        var sources = new BridgeTrackSources();
         List<Dictionary<string, object?>> entries;
         long total;
         if (kind is "songs" or "liked")
@@ -26,7 +27,7 @@ public sealed class BridgeCatalog(BridgeLibraryReader reader)
                 else
                 {
                     var result = (LibraryPageDto<LibraryPlaylistItemDto>)reader.Read(kind == "liked" ? "getFavoriteItems" : "getPlaylistItems", parameters, cancellation)!;
-                    entries = result.Items.Select(BridgeTrackProjection.PlaylistEntry).ToList(); total = result.Total;
+                    entries = result.Items.Select(row => BridgeTrackProjection.PlaylistEntry(row, sources, cancellation)).ToList(); total = result.Total;
                 }
             }
             else
@@ -45,7 +46,7 @@ public sealed class BridgeCatalog(BridgeLibraryReader reader)
                     var folder = folders.Resolve(parentId!); query.FolderId = folder.FolderId; query.Path = folder.Path; query.Recursive = true;
                 }
                 var result = (LibraryPageDto<LibraryTrackListRowDto>)reader.Read(method, parameters, cancellation)!;
-                entries = result.Items.Select(BridgeTrackProjection.Entry).ToList(); total = result.Total;
+                entries = result.Items.Select(row => BridgeTrackProjection.Entry(row, sources, cancellation)).ToList(); total = result.Total;
             }
         }
         else if (kind == "albums")
@@ -67,16 +68,17 @@ public sealed class BridgeCatalog(BridgeLibraryReader reader)
         }
         else if (kind == "playlists")
         {
-            var rows = (IEnumerable<LibraryPlaylistDto>)reader.Read("getPlaylists", cancellation: cancellation)!;
-            (entries, total) = ConfigurationPage(rows, search, page, row => row.Name,
-                row => BridgeTrackProjection.Container("playlist", row.Id, row.Name, row.Description ?? "", row.ItemCount, row.CoverId));
+            var result = BridgeLibraryMetadata.Read(reader.Profile, cancellation,
+                database => Echo.Core.Query.PlaylistPageQuery.Execute(database, query));
+            entries = result.Items.Select(row => BridgeTrackProjection.Container("playlist", row.Id, row.Name,
+                row.Description ?? "", row.ItemCount, row.CoverId)).ToList(); total = result.Total;
         }
         else if (kind == "folders" && parentKind is (null or "folder"))
             (entries, total) = new BridgeFolderCatalog(reader, folders).Page(
                 parentKind is null ? null : Required(parentId), search, sort, page, cancellation);
         else throw new BridgeException(400, "invalid_peer_catalog_query");
 
-        var response = new Dictionary<string, object?> { ["entries"] = entries, ["total"] = total, ["page"] = page, ["pageSize"] = 50, ["supportsSorting"] = true };
+        var response = new Dictionary<string, object?> { ["entries"] = entries, ["total"] = total, ["page"] = page, ["pageSize"] = 50, ["supportsSorting"] = true, ["supportsScopedSearch"] = true };
         if (kind == "albums" && parentKind == "artist") response["parent"] = new { kind = parentKind, id = parentId };
         return response;
     }
@@ -84,17 +86,4 @@ public sealed class BridgeCatalog(BridgeLibraryReader reader)
     private static string Required(string? value) => !string.IsNullOrEmpty(value) && value.Length <= 2048
         ? value : throw new BridgeException(400, "invalid_peer_catalog_parent");
 
-    private static (List<Dictionary<string, object?>> Entries, long Total) ConfigurationPage<T>(IEnumerable<T> rows,
-        string search, int page, Func<T, string> name, Func<T, Dictionary<string, object?>> project)
-    {
-        var entries = new List<Dictionary<string, object?>>(50);
-        long total = 0, offset = (page - 1L) * 50;
-        foreach (var row in rows)
-        {
-            if (!name(row).Contains(search.Trim(), StringComparison.OrdinalIgnoreCase)) continue;
-            if (total >= offset && entries.Count < 50) entries.Add(project(row));
-            total++;
-        }
-        return (entries, total);
-    }
 }

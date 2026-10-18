@@ -9,7 +9,8 @@ public static class GenrePageQuery
 {
     public static LibraryPageDto<LibraryGenreDto> Execute(
         ReadOnlyLibraryDatabase database,
-        CoreLibraryPageQuery? query)
+        CoreLibraryPageQuery? query,
+        bool allowUnindexedTextSort = false)
     {
         if (!QueryCapabilities.SupportsGenres(query))
         {
@@ -18,6 +19,7 @@ public static class GenrePageQuery
 
         if (!PersistedSortKeys.AreGenrePagesFresh(database))
         {
+            if (allowUnindexedTextSort) return UnindexedGenrePageQuery.Execute(database, query);
             throw new UnsupportedQueryException("local_genre_pages are stale; writer must sync before Core can serve genre pages.");
         }
 
@@ -125,7 +127,7 @@ public static class GenrePageQuery
         return items;
     }
 
-    private static string GenreOrderSql(string sort)
+    internal static string GenreOrderSql(string sort)
     {
         const string unclassifiedLast = "CASE WHEN unclassified != 0 OR genre_key = '__unclassified__' THEN 1 ELSE 0 END";
         const string nameAsc = "name_key COLLATE NOCASE ASC, name_text COLLATE NOCASE ASC, genre_key ASC";

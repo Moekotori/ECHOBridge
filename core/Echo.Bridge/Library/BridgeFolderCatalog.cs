@@ -51,7 +51,6 @@ public sealed class BridgeFolderCatalog(BridgeLibraryReader reader, BridgeFolder
                 var parent = folder.Path ?? (string)rootCommand.ExecuteScalar()!;
                 var prefix = parent.TrimEnd('\\', '/') + Path.DirectorySeparatorChar;
                 foreach (var value in scope.Parameters) command.Add(value);
-                command.Parameters.AddWithValue("$start", prefix.Length + 1);
                 command.Parameters.AddWithValue("$prefix", prefix);
                 scoped = $$"""
                     SELECT $prefix || SUBSTR(tail, 1, INSTR(tail, '/') - 1) AS node_id,
@@ -60,7 +59,7 @@ public sealed class BridgeFolderCatalog(BridgeLibraryReader reader, BridgeFolder
                            track_id, duration, size_bytes, mtime_ms
                     FROM (
                         SELECT tracks.id AS track_id, tracks.duration, tracks.size_bytes, tracks.mtime_ms,
-                               REPLACE(SUBSTR(tracks.path, $start), '\', '/') AS tail
+                               REPLACE(SUBSTR(tracks.path, LENGTH($prefix) + 1), '\', '/') AS tail
                         FROM tracks WHERE {{scope.Sql}}
                     ) WHERE INSTR(tail, '/') > 0
                     """;

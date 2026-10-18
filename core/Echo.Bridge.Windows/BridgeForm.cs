@@ -16,7 +16,7 @@ internal sealed class BridgeForm : Form
     private string? databasePath;
     private bool? displayedAutomatic;
     private int interfaces = -1;
-    private bool busy, exiting, initialSharingApplied, updatingStartup;
+    private bool busy, exiting, initialSharingApplied, updatingStartup, awaitingAutomaticLibrary;
 
     public BridgeForm(BridgeSettings settings, Func<string?>? discover = null, bool? dark = null,
         BridgeStartupRegistration? startup = null, Action<BridgeSettings>? persistSettings = null)
@@ -43,10 +43,14 @@ internal sealed class BridgeForm : Form
         view.Share.Click += async (_, _) => await Toggle();
         Activated += (_, _) => { RefreshStartup(); if (!busy && runtime.Session is null && settings.UseAutomaticLibrary) ResolveLibrary(); };
         Shown += async (_, _) => await ApplyInitialSharing();
-        networkStatus.Tick += (_, _) =>
+        networkStatus.Tick += async (_, _) =>
         {
             if (runtime.Session is not null) UpdateSharingStatus();
-            else if (Visible && !busy && settings.UseAutomaticLibrary) ResolveLibrary();
+            else if ((Visible || awaitingAutomaticLibrary) && !busy && settings.UseAutomaticLibrary)
+            {
+                ResolveLibrary();
+                if (awaitingAutomaticLibrary && databasePath is not null) await Toggle();
+            }
         };
     }
     private void RefreshStartup()
@@ -71,7 +75,12 @@ internal sealed class BridgeForm : Form
     {
         if (initialSharingApplied) return;
         initialSharingApplied = true;
-        if (settings.SharingEnabled) await Toggle();
+        if (settings.SharingEnabled)
+        {
+            ResolveLibrary();
+            awaitingAutomaticLibrary = settings.UseAutomaticLibrary && databasePath is null;
+            await Toggle();
+        }
     }
     public void StartInTray()
     {
@@ -120,6 +129,7 @@ internal sealed class BridgeForm : Form
     {
         using var dialog = new OpenFileDialog { Title = "选择 ECHO 已有曲库", Filter = "ECHO 曲库 (*.sqlite)|*.sqlite", CheckFileExists = true };
         if (dialog.ShowDialog(this) != DialogResult.OK) return;
+        awaitingAutomaticLibrary = false;
         settings.UseAutomaticLibrary = false; settings.DatabasePath = dialog.FileName; ResolveLibrary(); SaveSelection();
     }
     private async Task Toggle()
@@ -130,6 +140,7 @@ internal sealed class BridgeForm : Form
         {
             if (runtime.Session is not null)
             {
+                awaitingAutomaticLibrary = false;
                 networkStatus.Stop(); await runtime.Stop(); settings.SharingEnabled = false; persistSettings(settings);
                 view.Status("共享已停止", "曲库保留在 ECHO 中，可随时重新开启共享。"); view.Share.Text = "开启共享";
             }
@@ -137,6 +148,7 @@ internal sealed class BridgeForm : Form
             {
                 ResolveLibrary();
                 if (databasePath is null) { view.Status("未找到曲库", "先用 ECHO 加载曲库，或选择已有的 .sqlite 文件。", warning: true); return; }
+                awaitingAutomaticLibrary = false;
                 settings.DatabasePath = databasePath; settings.DeviceName = view.DeviceName.Text.Trim();
                 if (settings.DeviceName.Length == 0) settings.DeviceName = "ECHO Bridge";
                 view.Status("正在接入曲库", "准备只读连接与局域网广播…");
@@ -190,7 +202,7 @@ internal sealed class BridgeForm : Form
     private void UpdateStateTimer()
     {
         networkStatus.Interval = runtime.Session is null ? 5000 : 2000;
-        if (!exiting && (Visible || runtime.Session is not null)) networkStatus.Start();
+        if (!exiting && (Visible || runtime.Session is not null || awaitingAutomaticLibrary)) networkStatus.Start();
         else networkStatus.Stop();
     }
     protected override void OnVisibleChanged(EventArgs args)

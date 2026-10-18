@@ -9,8 +9,8 @@ internal static class BridgeUpdateSmoke
         directory = BridgeSmoke.Evidence(directory);
         try
         {
-            BridgeUpdateHandoff.Complete(file, directory);
             BridgeSmoke.Window(Path.Combine(directory, "restarted"));
+            BridgeUpdateHandoff.Complete(file, directory);
         }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException or JsonException or FormatException)
         {

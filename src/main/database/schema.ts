@@ -1,4 +1,5 @@
 import { albumCandidateIndexSql } from './albumCandidateIndexSchema';
+import { lyricsFilterIndexSchemaSql } from './lyricsFilterIndexSchema';
 import { remoteTracksFtsSchemaSql, tracksFtsSchemaSql } from './trackSearchFtsSchema';
 
 export const schemaMigrationTableSql = `
@@ -894,6 +895,8 @@ CREATE TABLE IF NOT EXISTS lyrics_cache (
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
+
+${lyricsFilterIndexSchemaSql}
 
 CREATE TABLE IF NOT EXISTS lyrics_candidates (
   id TEXT PRIMARY KEY,

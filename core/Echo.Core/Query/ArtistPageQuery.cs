@@ -10,7 +10,8 @@ public static class ArtistPageQuery
     public static LibraryPageDto<LibraryArtistDto> Execute(
         ReadOnlyLibraryDatabase database,
         CoreLibraryPageQuery? query,
-        CoreNormalizedEntitySearch? search = null)
+        CoreNormalizedEntitySearch? search = null,
+        bool allowUnindexedTextSort = false)
     {
         SearchContract.EnsureExecutableEntity(query, search);
         if (!QueryCapabilities.SupportsArtists(query, search))
@@ -22,29 +23,28 @@ public static class ArtistPageQuery
         var sort = QueryCapabilities.PrimarySort(query);
         var avatarPriority = query?.PrioritizeArtistAvatars == true;
         var textSort = QueryCapabilities.IsArtistTextSort(sort) || avatarPriority;
-        if (textSort && !PersistedSortKeys.AreArtistKeysFresh(database))
-        {
-            throw new UnsupportedQueryException("local_artist_sort_keys are stale; writer must sync before Core can order artist pages.");
-        }
+        var useTextKeys = !textSort || PersistedSortKeys.UseTextKeys(database, PersistedSortKeys.AreArtistKeysFresh(database),
+            allowUnindexedTextSort, "local_artist_sort_keys are stale; writer must sync before Core can order artist pages.");
 
-        var sortJoin = textSort
+        var sortJoin = textSort && useTextKeys
             ? "INNER JOIN local_artist_sort_keys AS sort_keys ON sort_keys.artist_id = artists.id"
             : string.Empty;
-        var lastPlayed = "(SELECT MAX(tracks.last_played_at) FROM artist_tracks INNER JOIN tracks ON tracks.id = artist_tracks.track_id WHERE artist_tracks.artist_id = artists.id AND tracks.missing = 0 AND tracks.library_hidden = 0)";
-        var playCount = "COALESCE((SELECT SUM(COALESCE(tracks.play_count, 0)) FROM artist_tracks INNER JOIN tracks ON tracks.id = artist_tracks.track_id WHERE artist_tracks.artist_id = artists.id AND tracks.missing = 0 AND tracks.library_hidden = 0), 0)";
-        var created = "(SELECT MAX(tracks.created_at) FROM artist_tracks INNER JOIN tracks ON tracks.id = artist_tracks.track_id WHERE artist_tracks.artist_id = artists.id AND tracks.missing = 0 AND tracks.library_hidden = 0)";
-        var orderSql = ArtistOrderSql(sort, lastPlayed, playCount, created, avatarPriority);
+        var trackSource = TrackQueryIndexes.EntityTrackSource(database);
+        var lastPlayed = $"(SELECT MAX(tracks.last_played_at) FROM artist_tracks INNER JOIN {trackSource} ON tracks.id = artist_tracks.track_id WHERE artist_tracks.artist_id = artists.id AND tracks.missing = 0 AND tracks.library_hidden = 0)";
+        var playCount = $"COALESCE((SELECT SUM(COALESCE(tracks.play_count, 0)) FROM artist_tracks INNER JOIN {trackSource} ON tracks.id = artist_tracks.track_id WHERE artist_tracks.artist_id = artists.id AND tracks.missing = 0 AND tracks.library_hidden = 0), 0)";
+        var created = $"(SELECT MAX(tracks.created_at) FROM artist_tracks INNER JOIN {trackSource} ON tracks.id = artist_tracks.track_id WHERE artist_tracks.artist_id = artists.id AND tracks.missing = 0 AND tracks.library_hidden = 0)";
+        var orderSql = ArtistOrderSql(sort, lastPlayed, playCount, created, avatarPriority, useTextKeys);
         var like = SqlFragments.LikeEntityFilter(
             [
                 "artists.name",
                 "COALESCE(artists.sort_name, '')",
             ],
             search);
-        var presentArtist = """
+        var presentArtist = $"""
             EXISTS (
               SELECT 1
               FROM artist_tracks
-              INNER JOIN tracks ON tracks.id = artist_tracks.track_id
+              INNER JOIN {trackSource} ON tracks.id = artist_tracks.track_id
               WHERE artist_tracks.artist_id = artists.id
                 AND tracks.missing = 0 AND tracks.library_hidden = 0
             )
@@ -165,9 +165,11 @@ public static class ArtistPageQuery
         return items;
     }
 
-    private static string ArtistOrderSql(string sort, string lastPlayed, string playCount, string created, bool avatarPriority)
+    private static string ArtistOrderSql(string sort, string lastPlayed, string playCount, string created, bool avatarPriority, bool useTextKeys)
     {
-        var nameOrder = "sort_keys.name_key COLLATE NOCASE ASC, sort_keys.name_text COLLATE NOCASE ASC, artists.id ASC";
+        var nameAsc = useTextKeys ? "sort_keys.name_key COLLATE NOCASE ASC, sort_keys.name_text COLLATE NOCASE ASC" : "artists.name COLLATE NOCASE ASC";
+        var nameDesc = useTextKeys ? "sort_keys.name_key COLLATE NOCASE DESC, sort_keys.name_text COLLATE NOCASE DESC" : "artists.name COLLATE NOCASE DESC";
+        var nameOrder = $"{nameAsc}, artists.id ASC";
         var tieBreak = avatarPriority ? nameOrder : "artists.id ASC";
         var order = sort switch
         {
@@ -179,7 +181,7 @@ public static class ArtistPageQuery
             "playCountAsc" => $"{playCount} ASC, {tieBreak}",
             "recent" or "createdDesc" => $"{created} IS NULL, {created} DESC, {tieBreak}",
             "random" => "RANDOM()",
-            "titleDesc" => "sort_keys.name_key COLLATE NOCASE DESC, sort_keys.name_text COLLATE NOCASE DESC, artists.id ASC",
+            "titleDesc" => $"{nameDesc}, artists.id ASC",
             _ => nameOrder,
         };
         return "ORDER BY " + (avatarPriority ? ArtistAvatarPrioritySql.Order + ", " : string.Empty) + order;

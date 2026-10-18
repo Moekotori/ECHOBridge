@@ -1,4 +1,11 @@
 import { personalLibrarySchemaSql } from './personalLibrarySchema';
+import { trackExcludeIndexSchemaSql } from './trackExcludeIndexSchema';
+import { trackPlaybackIndexSchemaSql } from './trackPlaybackIndexSchema';
+import { trackOrderIndexSchemaSql } from './trackOrderIndexSchema';
+import { trackQueryRefinementSchemaSql } from './trackQueryRefinementSchema';
+import { trackQueryWriteMaintenanceSchemaSql } from './trackQueryWriteMaintenanceSchema';
+import { trackQueryWriteOptimizationSchemaSql } from './trackQueryWriteOptimizationSchema';
+import { lyricsFilterIndexMigrationSql } from './lyricsFilterIndexSchema';
 import { listenerCustomizationSchemaSql } from './listenerCustomizationSchema';
 import { albumCandidateIndexSql } from './albumCandidateIndexSchema';
 import { lyricsVideoBindingSchemaSql } from './lyricsVideoBindingSchema';
@@ -1961,6 +1968,13 @@ export const migrations: Migration[] = [
   { id: 91, apply: database => {
     addColumnIfMissing(database, 'replay_gain_measurements', 'loudness_range_lu', 'loudness_range_lu REAL');
   } },
+  { id: 92, apply: database => { database.exec(lyricsFilterIndexMigrationSql); } },
+  { id: 93, apply: database => { database.exec(trackExcludeIndexSchemaSql); } },
+  { id: 94, apply: database => { database.exec(trackPlaybackIndexSchemaSql); } },
+  { id: 95, apply: database => { database.exec(trackOrderIndexSchemaSql); } },
+  { id: 96, apply: database => { database.exec(trackQueryRefinementSchemaSql); } },
+  { id: 97, apply: database => { database.exec(trackQueryWriteMaintenanceSchemaSql); } },
+  { id: 98, apply: database => { database.exec(trackQueryWriteOptimizationSchemaSql); } },
 ];
 
 export const runMigrations = (database: EchoDatabase): MigrationRunResult => {

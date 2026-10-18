@@ -21,7 +21,7 @@ internal sealed class BridgeSettings
             if (!File.Exists(filePath)) return new();
             if (new FileInfo(filePath).Length > 64 * 1024) return new() { SharingEnabled = false };
             var value = JsonSerializer.Deserialize<BridgeSettings>(File.ReadAllBytes(filePath));
-            if (value is null || !Regex.IsMatch(value.DeviceId, "^bridge-[a-f0-9]{32}$", RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(20)))
+            if (value is null || value.DeviceId is null || !Regex.IsMatch(value.DeviceId, "^bridge-[a-f0-9]{32}$", RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(20)))
                 return new() { SharingEnabled = false };
             if (string.IsNullOrWhiteSpace(value.DeviceName) || value.DeviceName.Length > 80) value.DeviceName = "ECHO Bridge";
             return value;

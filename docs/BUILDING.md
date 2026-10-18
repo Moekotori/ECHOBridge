@@ -38,7 +38,7 @@ For search data regeneration, run `npm run search:regenerate` and retain the cop
 从干净的对应源码提交发布完整 Windows 自包含目录，补齐包内 LICENSE、NOTICE、THIRD_PARTY_NOTICES.md、OpenCC 许可及 licenses/ 下的运行时许可，再执行：
 
 ```powershell
-./scripts/package-windows.ps1 -Directory misc/prepared-bundle -Version 26.10.15.2 -OutputDirectory misc/release
+./scripts/package-windows.ps1 -Directory misc/prepared-bundle -Version 26.10.18.1 -OutputDirectory misc/release
 ```
 
 脚本核对文件范围、私有数据、许可证、对应源码和每项 SHA-256，并生成完整便携 ZIP 与 release-manifest.json。它不处理或要求证书。

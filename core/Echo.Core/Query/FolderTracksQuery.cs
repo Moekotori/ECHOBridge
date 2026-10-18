@@ -10,7 +10,8 @@ public static class FolderTracksQuery
     public static LibraryPageDto<LibraryTrackListRowDto> Execute(
         ReadOnlyLibraryDatabase database,
         CoreLibraryPageQuery? query,
-        CoreNormalizedEntitySearch? search)
+        CoreNormalizedEntitySearch? search,
+        bool allowUnindexedTextSort = false)
     {
         if (!QueryCapabilities.SupportsFolderTracks(query))
         {
@@ -18,10 +19,12 @@ public static class FolderTracksQuery
         }
 
         SearchContract.EnsureExecutableEntity(query, search);
-        if (!PersistedSortKeys.AreTrackKeysFresh(database))
-        {
-            throw new UnsupportedQueryException("local_track_sort_keys are stale; writer must sync before Core can order folder pages.");
-        }
+        var useTextKeys = PersistedSortKeys.UseTextKeys(database, PersistedSortKeys.AreTrackKeysFresh(database),
+            allowUnindexedTextSort, "local_track_sort_keys are stale; writer must sync before Core can order folder pages.");
+        var sortJoin = useTextKeys ? "INNER JOIN local_track_sort_keys AS sort_keys ON sort_keys.track_id = tracks.id" : "";
+        var textColumns = useTextKeys
+            ? "sort_keys.title_key, sort_keys.title_text, sort_keys.artist_key, sort_keys.artist_text, sort_keys.album_key, sort_keys.album_text"
+            : "tracks.title AS title_key, tracks.title AS title_text, tracks.artist AS artist_key, tracks.artist AS artist_text, tracks.album AS album_key, tracks.album AS album_text";
 
         var page = PageQueryNormalizer.Normalize(query);
         var list = QueryCapabilities.IsListProjection(query);
@@ -70,14 +73,14 @@ public static class FolderTracksQuery
               """
             : string.Empty;
         var playbackColumns = playback
-            ? "COALESCE(local_playback_stats.play_count, 0) AS play_count, local_playback_stats.last_played_at AS last_played_at"
+            ? "MAX(COALESCE(tracks.play_count, 0), COALESCE(local_playback_stats.play_count, 0)) AS play_count, local_playback_stats.last_played_at AS last_played_at"
             : "tracks.play_count, tracks.last_played_at";
         var playbackJoin = playback ? "LEFT JOIN local_playback_stats ON local_playback_stats.track_id = tracks.id" : string.Empty;
         var orderSql = TrackOrderSql.ForSorts(page.Sorts, searchActive: false);
         var countSql = $"""
             SELECT COUNT(*)
             FROM tracks
-            INNER JOIN local_track_sort_keys AS sort_keys ON sort_keys.track_id = tracks.id
+            {sortJoin}
             {whereSql}
             """;
         var idSql = $"""
@@ -95,16 +98,11 @@ public static class FolderTracksQuery
                 tracks.bit_depth,
                 {playbackColumns},
                 0 AS search_rank,
-                sort_keys.title_key,
-                sort_keys.title_text,
-                sort_keys.artist_key,
-                sort_keys.artist_text,
-                sort_keys.album_key,
-                sort_keys.album_text,
+                {textColumns},
                 tracks.disc_no,
                 tracks.track_no
               FROM tracks
-              INNER JOIN local_track_sort_keys AS sort_keys ON sort_keys.track_id = tracks.id
+              {sortJoin}
               {playbackJoin}
               {whereSql}
             )
@@ -162,11 +160,11 @@ public static class FolderTracksQuery
         }
 
         var sql = $"""
-            SELECT track_id, SUM(completed_count) AS play_count, MAX(last_started_at) AS last_played_at
-            FROM playback_history_stats
-            WHERE media_type = 'local'
-              AND track_id {SqlFragments.JsonEachIds}
-            GROUP BY track_id
+            SELECT tracks.id, MAX(COALESCE(tracks.play_count, 0), COALESCE(SUM(history.completed_count), 0)) AS play_count,
+                   MAX(history.last_started_at) AS last_played_at
+            FROM tracks LEFT JOIN playback_history_stats history ON history.track_id=tracks.id AND history.media_type='local'
+            WHERE tracks.id {SqlFragments.JsonEachIds}
+            GROUP BY tracks.id
             """;
         var byId = items.ToDictionary(static item => item.Id, StringComparer.Ordinal);
         using var reader = CachedQuery.Reader(
@@ -181,7 +179,7 @@ public static class FolderTracksQuery
                 continue;
             }
 
-            track.PlayCount = Math.Max(0, Convert.ToInt32(reader[1] ?? 0));
+            track.PlayCount = Math.Max(track.PlayCount, Convert.ToInt32(reader[1] ?? 0));
             track.LastPlayedAt = Mapping.LibraryText.TextOrNull(reader.IsDBNull(2) ? null : reader.GetValue(2));
         }
     }
